@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ public class ScrollOfTransmutation extends InventoryScroll {
 					}
 					Dungeon.hero.spend(-Dungeon.hero.cooldown()); //cancel equip/unequip time
 				} else {
-					if (item instanceof MissileWeapon){
+					if (item instanceof MissileWeapon && !(item instanceof TippedDart)){
 						item.detachAll(Dungeon.hero.belongings.backpack);
 					} else {
 						item.detach(Dungeon.hero.belongings.backpack);

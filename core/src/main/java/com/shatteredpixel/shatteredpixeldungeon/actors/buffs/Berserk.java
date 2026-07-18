@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -159,6 +159,9 @@ public class Berserk extends ShieldBuff implements ActionIndicator.Action {
 	@Override
 	public void detach() {
 		super.detach();
+		if (state == State.BERSERK) {
+			state = State.RECOVERING;
+		}
 		ActionIndicator.clearAction(this);
 	}
 

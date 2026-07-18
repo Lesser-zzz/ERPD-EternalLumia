@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -221,7 +221,7 @@ abstract public class MissileWeapon extends Weapon {
 	protected float adjacentAccFactor(Char owner, Char target){
 		if (Dungeon.level.adjacent( owner.pos, target.pos )) {
 			if (owner instanceof Hero){
-				return (0.5f + 0.2f*((Hero) owner).pointsInTalent(Talent.POINT_BLANK));
+				return (0.5f + 0.25f*((Hero) owner).pointsInTalent(Talent.POINT_BLANK));
 			} else {
 				return 0.5f;
 			}
@@ -327,10 +327,12 @@ abstract public class MissileWeapon extends Weapon {
 					parent.identify();
 				}
 			}
+		} else if (parent != null && isIdentified() && !parent.isIdentified()){
+			parent.identify();
 		}
 
-		if (!isIdentified() && ShardOfOblivion.passiveIDDisabled()){
-			Buff.prolong(curUser, ShardOfOblivion.ThrownUseTracker.class, 50f);
+		if (attacker == Dungeon.hero && !isIdentified() && ShardOfOblivion.passiveIDDisabled()){
+			Buff.prolong(Dungeon.hero, ShardOfOblivion.ThrownUseTracker.class, 50f);
 		}
 
 		return result;
@@ -443,9 +445,9 @@ abstract public class MissileWeapon extends Weapon {
 	public float durabilityPerUse( int level ){
 		float usages = baseUses * (float)(Math.pow(1.5f, level));
 
-		//+33%/50% durability
+		//+50%/75% durability
 		if (Dungeon.hero != null && Dungeon.hero.hasTalent(Talent.DURABLE_PROJECTILES)){
-			usages *= 1f + (1+Dungeon.hero.pointsInTalent(Talent.DURABLE_PROJECTILES))/6f;
+			usages *= 1.25f + (0.25f*Dungeon.hero.pointsInTalent(Talent.DURABLE_PROJECTILES));
 		}
 		if (holster) {
 			usages *= MagicalHolster.HOLSTER_DURABILITY_FACTOR;
@@ -507,7 +509,7 @@ abstract public class MissileWeapon extends Weapon {
 				damage += Hero.heroDamageIntRange( 0, exStr );
 			}
 			if (owner.buff(Momentum.class) != null && owner.buff(Momentum.class).freerunning()) {
-				damage = Math.round(damage * (1f + 0.1f * ((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM)));
+				damage = Math.round(damage * (1f + 0.15f * ((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM)));
 			}
 		}
 		
@@ -539,9 +541,13 @@ abstract public class MissileWeapon extends Weapon {
 				durability = MAX_DURABILITY;
 			}
 
-			masteryPotionBonus = masteryPotionBonus || ((MissileWeapon) other).masteryPotionBonus;
 			levelKnown = levelKnown || other.levelKnown;
 			cursedKnown = cursedKnown || other.cursedKnown;
+			if (((Weapon)other).readyToIdentify()){
+				setIDReady();
+			}
+
+			masteryPotionBonus = masteryPotionBonus || ((MissileWeapon) other).masteryPotionBonus;
 			enchantHardened = enchantHardened || ((MissileWeapon) other).enchantHardened;
 
 			//if other has a curse/enchant status that's a higher priority, copy it. in the following order:
@@ -598,7 +604,7 @@ abstract public class MissileWeapon extends Weapon {
 		parent = null;
 		if (!UpgradedSetTracker.pickupValid(hero, this)){
 			Sample.INSTANCE.play( Assets.Sounds.ITEM );
-			hero.spendAndNext( TIME_TO_PICK_UP );
+			hero.spendAndNext( pickupDelay() );
 			GLog.w(Messages.get(this, "dust"));
 			quantity(0);
 			return true;
@@ -649,7 +655,7 @@ abstract public class MissileWeapon extends Weapon {
 		}
 
 		info += "\n\n";
-		String statsInfo = Messages.get(this, "stats_desc");
+		String statsInfo = statsInfo();
 		if (!statsInfo.equals("")) info += statsInfo + " ";
 		info += Messages.get(MissileWeapon.class, "distance");
 
@@ -680,6 +686,10 @@ abstract public class MissileWeapon extends Weapon {
 		}
 		
 		return info;
+	}
+
+	public String statsInfo(){
+		return Messages.get(this, "stats_desc");
 	}
 	
 	@Override
@@ -771,6 +781,10 @@ abstract public class MissileWeapon extends Weapon {
 
 	//also used by liquid metal crafting to track when a set is consumed
 	public static class UpgradedSetTracker extends Buff {
+
+		{
+			revivePersists = true;
+		}
 
 		public HashMap<Long, Integer> levelThresholds = new HashMap<>();
 

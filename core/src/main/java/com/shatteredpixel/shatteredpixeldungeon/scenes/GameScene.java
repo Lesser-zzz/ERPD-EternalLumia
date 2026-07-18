@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.journal.Guidebook;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.InventoryScroll;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.DimensionalSundial;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.TrinketCatalyst;
@@ -121,6 +122,7 @@ import com.shatteredpixel.shatteredpixeldungeon.windows.WndKeyBindings;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndResurrect;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndUpgrade;
 import com.watabou.gltextures.TextureCache;
 import com.watabou.glwrap.Blending;
 import com.watabou.input.ControllerHandler;
@@ -140,7 +142,6 @@ import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.particles.Emitter;
 import com.watabou.noosa.tweeners.Tweener;
 import com.watabou.utils.Callback;
-import com.watabou.utils.DeviceCompat;
 import com.watabou.utils.GameMath;
 import com.watabou.utils.PlatformSupport;
 import com.watabou.utils.Point;
@@ -173,7 +174,7 @@ public class GameScene extends PixelScene {
 	private BossHealthBar boss;
 
 	private GameLog log;
-	
+
 	private static CellSelector cellSelector;
 	
 	private Group terrain;
@@ -210,7 +211,7 @@ public class GameScene extends PixelScene {
 	{
 		inGameScene = true;
 	}
-	
+
 	@Override
 	public void create() {
 		
@@ -369,21 +370,26 @@ public class GameScene extends PixelScene {
 		int uiSize = SPDSettings.interfaceSize();
 
 		//display cutouts can obstruct various UI elements, so we need to adjust for that sometimes
+		float heroPaneExtraWidth = insets.left;
 		float menuBarMaxLeft = uiCamera.width-insets.right-MenuPane.WIDTH;
 		int hpBarMaxWidth = 50; //default max width
-		float buffBarTopRowMaxWidth = 50; //default max width
-		if (largeInsetTop != insets.top){
-			//iOS's Dynamic island badly obstructs the first buff bar row
-			if (DeviceCompat.isiOS()){
-				//TODO bad to hardcode and approximate this atm
-				// need to change this so iOS platformsupport returns cutout dimensions
-				float cutoutLeft = (Game.width*0.3f)/defaultZoom;
-				buffBarTopRowMaxWidth = Math.min(50, cutoutLeft - 32);
-			} else if (DeviceCompat.isAndroid()) {
-				//Android hole punches are of varying size and may obstruct the menu, HP bar, or buff bar
+		float[] buffBarRowLimits = new float[9];
+		float[] buffBarRowAdjusts = new float[9];
+
+		if (largeInsetTop == 0 && insets.top > 0){
+				//smaller non-notch cutouts are of varying size and may obstruct various UI elements
+				// some are small hole punches, some are huge dynamic islands
 				RectF cutout = Game.platform.getDisplayCutout().scale(1f / defaultZoom);
+				//if the cutout is positioned to obstruct the hero portrait in the status pane
+				if (cutout.top < 30
+						&& cutout.left < 20
+						&& cutout.right > 12) {
+					heroPaneExtraWidth = Math.max(heroPaneExtraWidth, cutout.right-12);
+					//make sure we have space to actually move it though
+					heroPaneExtraWidth = Math.min(heroPaneExtraWidth, uiCamera.width - PixelScene.MIN_WIDTH_P);
+				}
 				//if the cutout is positioned to obstruct the menu bar
-				if (cutout.top < 20
+				else if (cutout.top < 20
 						&& cutout.left < menuBarMaxLeft + MenuPane.WIDTH
 						&& cutout.right > menuBarMaxLeft) {
 					menuBarMaxLeft = Math.min(menuBarMaxLeft, cutout.left - MenuPane.WIDTH);
@@ -391,7 +397,7 @@ public class GameScene extends PixelScene {
 					menuBarMaxLeft = Math.max(menuBarMaxLeft, PixelScene.MIN_WIDTH_P-MenuPane.WIDTH);
 				}
 				//if the cutout is positioned to obstruct the HP bar
-				if (cutout.left < 78
+				else if (cutout.left < 78
 						&& cutout.top < 4
 						&& cutout.right > 32) {
 					//subtract starting position, but add a bit back due to end of bar
@@ -399,13 +405,26 @@ public class GameScene extends PixelScene {
 					hpBarMaxWidth = Math.max(hpBarMaxWidth, 21); //cannot go below 21 (30 effective)
 				}
 				//if the cutout is positioned to obstruct the buff bar
-				if (cutout.left < 80
+				if (cutout.left < 84
 						&& cutout.top < 10
 						&& cutout.right > 32
 						&& cutout.bottom > 11) {
-					buffBarTopRowMaxWidth = cutout.left - 32; //subtract starting position
+					int i = 1;
+					int rowTop = 11;
+					//in most cases this just obstructs one row, but dynamic island can block more =S
+					while (cutout.bottom > rowTop){
+						if (i == 1 || cutout.bottom > rowTop+2 ) { //always shorten first row
+							//subtract starting position, add a bit back to allow slight overlap
+							buffBarRowLimits[i] = cutout.left - 32 + 3;
+						} else {
+							//if row is only slightly cut off, lower it instead of limiting width
+							buffBarRowAdjusts[i] = cutout.bottom - rowTop + 1;
+							rowTop += buffBarRowAdjusts[i];
+						}
+						i++;
+						rowTop += 8;
+					}
 				}
-			}
 		}
 
 		float screentop = largeInsetTop;
@@ -432,8 +451,10 @@ public class GameScene extends PixelScene {
 
 		status = new StatusPane( SPDSettings.interfaceSize() > 0 );
 		status.camera = uiCamera;
+		StatusPane.heroPaneExtraWidth = heroPaneExtraWidth;
 		StatusPane.hpBarMaxWidth = hpBarMaxWidth;
-		StatusPane.buffBarTopRowMaxWidth = buffBarTopRowMaxWidth;
+		StatusPane.buffBarRowMaxWidths = buffBarRowLimits;
+		StatusPane.buffBarRowAdjusts = buffBarRowAdjusts;
 		status.setRect(insets.left, uiSize > 0 ? uiCamera.height-39-insets.bottom : screentop, uiCamera.width - insets.left - insets.right, 0 );
 		add(status);
 
@@ -449,7 +470,14 @@ public class GameScene extends PixelScene {
 
 		boss = new BossHealthBar();
 		boss.camera = uiCamera;
-		boss.setPos( (uiCamera.width - boss.width())/2, screentop + 26);
+		boss.setPos( (uiCamera.width - boss.width())/2, screentop + (landscape() ? 7 : 26));
+		if (buffBarRowLimits[2] != 0){
+			//if we potentially have a 3rd buff bar row, lower by 7px
+			boss.setPos(boss.left(), boss.top() + 7);
+		} else if (buffBarRowAdjusts[2] != 0){
+			//
+			boss.setPos(boss.left(), boss.top() + buffBarRowAdjusts[2]);
+		}
 		add(boss);
 
 		resume = new ResumeIndicator();
@@ -504,7 +532,7 @@ public class GameScene extends PixelScene {
 		}
 
 		layoutTags();
-		
+
 		switch (InterlevelScene.mode) {
 			case RESURRECT:
 				Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
@@ -513,7 +541,17 @@ public class GameScene extends PixelScene {
 				new Flare( 5, 16 ).color( 0xFFFF00, true ).show( hero, 4f ) ;
 				break;
 			case RETURN:
-				ScrollOfTeleportation.appearVFX( Dungeon.hero );
+				if (Dungeon.level.pit[Dungeon.hero.pos] && !Dungeon.hero.flying){
+					//delay this so falling into the chasm processes properly
+					ShatteredPixelDungeon.runOnRenderThread(new Callback() {
+						@Override
+						public void call() {
+							ScrollOfTeleportation.appearVFX(Dungeon.hero);
+						}
+					});
+				} else {
+					ScrollOfTeleportation.appearVFX(Dungeon.hero);
+				}
 				break;
 			case DESCEND:
 			case FALL:
@@ -795,7 +833,7 @@ public class GameScene extends PixelScene {
 	public static boolean updateTags = false;
 
 	private static float waterOfs = 0;
-	
+
 	@Override
 	public synchronized void update() {
 		lastOffset = null;
@@ -833,7 +871,7 @@ public class GameScene extends PixelScene {
 						Actor.process();
 					}
 				};
-				
+
 				//if cpu cores are limited, game should prefer drawing the current frame
 				if (Runtime.getRuntime().availableProcessors() == 1) {
 					actorThread.setPriority(Thread.NORM_PRIORITY - 1);
@@ -992,7 +1030,7 @@ public class GameScene extends PixelScene {
 	public void addCustomWall( CustomTilemap visual){
 		customWalls.add( visual.create() );
 	}
-	
+
 	private void addHeapSprite( Heap heap ) {
 		ItemSprite sprite = heap.sprite = (ItemSprite)heaps.recycle( ItemSprite.class );
 		sprite.revive();
@@ -1005,14 +1043,6 @@ public class GameScene extends PixelScene {
 		heap.sprite.revive();
 		heap.sprite.link( heap );
 		heaps.add( heap.sprite );
-	}
-	
-	private void addPlantSprite( Plant plant ) {
-
-	}
-
-	private void addTrapSprite( Trap trap ) {
-
 	}
 	
 	private void addBlobSprite( final Blob gas ) {
@@ -1090,18 +1120,6 @@ public class GameScene extends PixelScene {
 	}
 	
 	// -------------------------------------------------------
-
-	public static void add( Plant plant ) {
-		if (scene != null) {
-			scene.addPlantSprite( plant );
-		}
-	}
-
-	public static void add( Trap trap ) {
-		if (scene != null) {
-			scene.addTrapSprite( trap );
-		}
-	}
 	
 	public static void add( Blob gas ) {
 		Actor.add( gas );
@@ -1125,11 +1143,7 @@ public class GameScene extends PixelScene {
 	}
 	
 	public static void add( Mob mob ) {
-		Dungeon.level.mobs.add( mob );
-		if (scene != null) {
-			scene.addMobSprite(mob);
-			Actor.add(mob);
-		}
+		add( mob, 0);
 	}
 
 	public static void addSprite( Mob mob ) {
@@ -1138,8 +1152,13 @@ public class GameScene extends PixelScene {
 	
 	public static void add( Mob mob, float delay ) {
 		Dungeon.level.mobs.add( mob );
-		scene.addMobSprite( mob );
-		Actor.addDelayed( mob, delay );
+		//mobs added on partial turns wait until next full turn to act
+		delay = (float)Math.ceil(Actor.now() + delay) - Actor.now();
+		if (scene != null) {
+			scene.addMobSprite(mob);
+			Actor.addDelayed(mob, delay);
+			mob.spendToWhole();
+		}
 	}
 	
 	public static void add( EmoIcon icon ) {
@@ -1323,7 +1342,7 @@ public class GameScene extends PixelScene {
 			scene.terrainFeatures.growPlant( cell );
 		}
 	}
-	
+
 	public static void discoverTile( int pos, int oldValue ) {
 		if (scene != null) {
 			scene.tiles.discover( pos, oldValue );
@@ -1344,7 +1363,7 @@ public class GameScene extends PixelScene {
 				if (lastOffset != null) {
 					offsetToInherit = lastOffset;
 				}
-				if (offsetToInherit != null) {
+				if (offsetToInherit != null && !offsetToInherit.isZero()) {
 					wnd.offset(offsetToInherit);
 					wnd.boundOffsetWithMargin(3);
 				}
@@ -1448,10 +1467,12 @@ public class GameScene extends PixelScene {
 				@Override
 				public void call() {
 					//greater than 0 to account for negative values (which have the first bit set to 1)
-					if (color > 0 && color < 0x01000000) {
-						scene.fadeIn(0xFF000000 | color, lightmode);
-					} else {
-						scene.fadeIn(color, lightmode);
+					if (scene != null) {
+						if (color > 0 && color < 0x01000000) {
+							scene.fadeIn(0xFF000000 | color, lightmode);
+						} else {
+							scene.fadeIn(color, lightmode);
+						}
 					}
 				}
 			});
@@ -1562,10 +1583,47 @@ public class GameScene extends PixelScene {
 				return wnd;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
+	//logic for preserving inventory selection windows on scene reset (e.g. via auto-rotate)
+	private static WndBag.ItemSelector savedSelector;
+
+	@Override
+	public synchronized void saveWindows() {
+		if (members == null) return;
+
+		super.saveWindows();
+		if (scene != null && scene.inventory != null && scene.inventory.getSelector() != null){
+			savedSelector = scene.inventory.getSelector();
+		} else {
+			for (Gizmo g : members.toArray(new Gizmo[0])){
+				if (g instanceof WndBag){
+					savedSelector = ((WndBag) g).getSelector();
+				//also keeps selector active over inventory scroll cancel and upgrade window
+				} else if (g instanceof InventoryScroll.WndConfirmCancel){
+					savedSelector = ((InventoryScroll.WndConfirmCancel) g).getItemSelector();
+				} else if (g instanceof WndUpgrade){
+					savedSelector = ((WndUpgrade) g).getItemSelector();
+				}
+			}
+		}
+	}
+
+	@Override
+	public synchronized void restoreWindows() {
+		super.restoreWindows();
+		if (savedSelector != null){
+			if (scene != null && scene.inventory != null){
+				scene.inventory.setSelector(savedSelector);
+			} else {
+				addToFront(new WndBag(Dungeon.hero.belongings.backpack, savedSelector));
+			}
+			savedSelector = null;
+		}
+	}
+
 	public static boolean cancel() {
 		cellSelector.resetKeyHold();
 		if (Dungeon.hero != null && (Dungeon.hero.curAction != null || Dungeon.hero.resting)) {

@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -237,13 +237,10 @@ public class WndSettings extends WndTabbed {
 			add(sep1);
 
 			String fullscreenText = Messages.get(this, "fullscreen");
-			//TODO English only for now, make sure to translate later
-			if (Messages.lang() == Languages.ENGLISH){
-				if (DeviceCompat.isAndroid()){
-					fullscreenText = Messages.get(this, "hide_navigation");
-				} else if (DeviceCompat.isiOS()){
-					fullscreenText = Messages.get(this, "hide_gesture");
-				}
+			if (DeviceCompat.isAndroid()){
+				fullscreenText = Messages.get(this, "hide_navigation");
+			} else if (DeviceCompat.isiOS()){
+				fullscreenText = Messages.get(this, "hide_gesture");
 			}
 			chkFullscreen = new CheckBox( fullscreenText ) {
 				@Override

@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -184,8 +184,8 @@ public abstract class Level implements Bundlable {
 	public HashMap<Class<? extends Blob>,Blob> blobs;
 	public SparseArray<Plant> plants;
 	public SparseArray<Trap> traps;
-	public HashSet<CustomTilemap> customTiles;
-	public HashSet<CustomTilemap> customWalls;
+	public ArrayList<CustomTilemap> customTiles;
+	public ArrayList<CustomTilemap> customWalls;
 	
 	protected ArrayList<Item> itemsToSpawn = new ArrayList<>();
 
@@ -302,8 +302,8 @@ public abstract class Level implements Bundlable {
 			blobs = new HashMap<>();
 			plants = new SparseArray<>();
 			traps = new SparseArray<>();
-			customTiles = new HashSet<>();
-			customWalls = new HashSet<>();
+			customTiles = new ArrayList<>();
+			customWalls = new ArrayList<>();
 			
 		} while (!build());
 		
@@ -363,8 +363,8 @@ public abstract class Level implements Bundlable {
 
 		version = bundle.getInt( VERSION );
 		
-		//saves from before v2.3.2 are not supported
-		if (version < ShatteredPixelDungeon.v2_4_2){
+		//saves from before v2.5.4 are not supported
+		if (version < ShatteredPixelDungeon.v2_5_4){
 			throw new RuntimeException("old save");
 		}
 
@@ -375,8 +375,8 @@ public abstract class Level implements Bundlable {
 		blobs = new HashMap<>();
 		plants = new SparseArray<>();
 		traps = new SparseArray<>();
-		customTiles = new HashSet<>();
-		customWalls = new HashSet<>();
+		customTiles = new ArrayList<>();
+		customWalls = new ArrayList<>();
 		
 		map		= bundle.getIntArray( MAP );
 
@@ -830,14 +830,14 @@ public abstract class Level implements Bundlable {
 		
 		for (int i=0; i < length(); i++) {
 			int flags = Terrain.flags[map[i]];
-			passable[i]		= (flags & Terrain.PASSABLE) != 0;
-			losBlocking[i]	= (flags & Terrain.LOS_BLOCKING) != 0;
-			flamable[i]		= (flags & Terrain.FLAMABLE) != 0;
-			secret[i]		= (flags & Terrain.SECRET) != 0;
-			solid[i]		= (flags & Terrain.SOLID) != 0;
-			avoid[i]		= (flags & Terrain.AVOID) != 0;
-			water[i]		= (flags & Terrain.LIQUID) != 0;
-			pit[i]			= (flags & Terrain.PIT) != 0;
+			passable[i]     = (flags & Terrain.PASSABLE) != 0;
+			losBlocking[i]  = (flags & Terrain.LOS_BLOCKING) != 0;
+			flamable[i]     = (flags & Terrain.FLAMABLE) != 0;
+			secret[i]       = (flags & Terrain.SECRET) != 0;
+			solid[i]        = (flags & Terrain.SOLID) != 0;
+			avoid[i]        = (flags & Terrain.AVOID) != 0;
+			water[i]        = (flags & Terrain.LIQUID) != 0;
+			pit[i]          = (flags & Terrain.PIT) != 0;
 		}
 
 		for (Blob b : blobs.values()){
@@ -876,6 +876,25 @@ public abstract class Level implements Bundlable {
 			}
 		}
 
+	}
+
+	//updates open space both on the cell itself and adjacent cells
+	public void updateOpenSpace(int cell){
+		for (int i : PathFinder.NEIGHBOURS9) {
+			if (solid[cell+i]){
+				openSpace[cell+i] = false;
+			} else {
+				for (int j = 1; j < PathFinder.CIRCLE8.length; j += 2){
+					if (solid[cell+i+PathFinder.CIRCLE8[j]]) {
+						openSpace[cell+i] = false;
+					} else if (!solid[cell+i+PathFinder.CIRCLE8[(j+1)%8]]
+							&& !solid[cell+i+PathFinder.CIRCLE8[(j+2)%8]]){
+						openSpace[cell+i] = true;
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	public void destroy( int pos ) {
@@ -917,44 +936,39 @@ public abstract class Level implements Bundlable {
 	}
 	
 	public static void set( int cell, int terrain, Level level ) {
-		Painter.set( level, cell, terrain );
+		Painter.set(level, cell, terrain);
 
-		if (terrain != Terrain.TRAP && terrain != Terrain.SECRET_TRAP && terrain != Terrain.INACTIVE_TRAP){
-			level.traps.remove( cell );
+		if (terrain != Terrain.TRAP && terrain != Terrain.SECRET_TRAP && terrain != Terrain.INACTIVE_TRAP) {
+			level.traps.remove(cell);
 		}
+
+		level.updateCellFlags(cell);
+	}
+
+	public void updateCellFlags( int cell ){
+		int terrain = map[cell];
 
 		int flags = Terrain.flags[terrain];
-		level.passable[cell]		= (flags & Terrain.PASSABLE) != 0;
-		level.losBlocking[cell]	    = (flags & Terrain.LOS_BLOCKING) != 0;
-		level.flamable[cell]		= (flags & Terrain.FLAMABLE) != 0;
-		level.secret[cell]		    = (flags & Terrain.SECRET) != 0;
-		level.solid[cell]			= (flags & Terrain.SOLID) != 0;
-		level.avoid[cell]			= (flags & Terrain.AVOID) != 0;
-		level.pit[cell]			    = (flags & Terrain.PIT) != 0;
-		level.water[cell]			= terrain == Terrain.WATER;
+		passable[cell]      = (flags & Terrain.PASSABLE) != 0;
+		losBlocking[cell]   = (flags & Terrain.LOS_BLOCKING) != 0;
+		flamable[cell]      = (flags & Terrain.FLAMABLE) != 0;
+		secret[cell]        = (flags & Terrain.SECRET) != 0;
+		solid[cell]         = (flags & Terrain.SOLID) != 0;
+		avoid[cell]         = (flags & Terrain.AVOID) != 0;
+		pit[cell]           = (flags & Terrain.PIT) != 0;
+		water[cell]         = terrain == Terrain.WATER;
 
-		if (level instanceof SewerLevel){
-			if (level.map[cell] == Terrain.REGION_DECO || level.map[cell] == Terrain.REGION_DECO_ALT){
-				level.flamable[cell] = true;
+		if (this instanceof SewerLevel){
+			if (map[cell] == Terrain.REGION_DECO || map[cell] == Terrain.REGION_DECO_ALT){
+				flamable[cell] = true;
 			}
 		}
 
-		for (int i : PathFinder.NEIGHBOURS9){
-			i = cell + i;
-			if (level.solid[i]){
-				level.openSpace[i] = false;
-			} else {
-				for (int j = 1; j < PathFinder.CIRCLE8.length; j += 2){
-					if (level.solid[i+PathFinder.CIRCLE8[j]]) {
-						level.openSpace[i] = false;
-					} else if (!level.solid[i+PathFinder.CIRCLE8[(j+1)%8]]
-							&& !level.solid[i+PathFinder.CIRCLE8[(j+2)%8]]){
-						level.openSpace[i] = true;
-						break;
-					}
-				}
-			}
+		for (Blob b : blobs.values()){
+			b.onUpdateCellFlags(this, cell);
 		}
+
+		updateOpenSpace(cell);
 	}
 	
 	public Heap drop( Item item, int cell ) {
@@ -1568,6 +1582,7 @@ public abstract class Level implements Bundlable {
 			case Terrain.FURROWED_GRASS:
 				return Messages.get(Level.class, "furrowed_grass_name");
 			case Terrain.LOCKED_DOOR:
+			case Terrain.HERO_LKD_DR:
 				return Messages.get(Level.class, "locked_door_name");
 			case Terrain.CRYSTAL_DOOR:
 				return Messages.get(Level.class, "crystal_door_name");
@@ -1618,6 +1633,7 @@ public abstract class Level implements Bundlable {
 			case Terrain.FURROWED_GRASS:
 				return Messages.get(Level.class, "high_grass_desc");
 			case Terrain.LOCKED_DOOR:
+			case Terrain.HERO_LKD_DR:
 				return Messages.get(Level.class, "locked_door_desc");
 			case Terrain.CRYSTAL_DOOR:
 				return Messages.get(Level.class, "crystal_door_desc");

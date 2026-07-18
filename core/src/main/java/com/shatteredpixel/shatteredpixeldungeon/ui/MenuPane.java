@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ public class MenuPane extends Component {
 		add(versionOverflowBG);
 
 		version = new BitmapText( "v" + Game.version , PixelScene.pixelFont);
-		version.alpha( 0.5f );
+		version.hardlight( 0xCACFC2 );
 		add(version);
 
 		depthIcon = Icons.get(Dungeon.level.feeling);

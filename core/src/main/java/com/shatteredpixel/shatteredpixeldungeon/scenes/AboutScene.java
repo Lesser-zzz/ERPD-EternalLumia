@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,8 +83,8 @@ public class AboutScene extends PixelScene {
 				"Splash Art & Design:",
 				Icons.ALEKS.get(),
 				"Aleksandar Komitov",
-				"akomitov.artstation.com",
-				"https://akomitov.artstation.com/");
+				"alekskomitov.com",
+				"https://www.alekskomitov.com/");
 		alex.setSize(colWidth/2f, 0);
 		if (landscape()){
 			alex.setPos(shpx.right(), shpx.top() + (shpx.height() - alex.height()*2)/2f);
@@ -93,23 +93,23 @@ public class AboutScene extends PixelScene {
 		}
 		content.add(alex);
 
-		CreditsBlock charlie = new CreditsBlock(false, Window.SHPX_COLOR,
+		CreditsBlock celesti = new CreditsBlock(false, Window.SHPX_COLOR,
 				"Sound Effects:",
 				Icons.CELESTI.get(),
 				"Celesti",
-				"s9menine.itch.io",
-				"https://s9menine.itch.io");
-		charlie.setRect(alex.right(), alex.top(), colWidth/2f, 0);
-		content.add(charlie);
+				"celesti-whispers.itch.io",
+				"https://celesti-whispers.itch.io/");
+		celesti.setRect(alex.right(), alex.top(), colWidth/2f, 0);
+		content.add(celesti);
 
-		CreditsBlock kristjan = new CreditsBlock(false, Window.SHPX_COLOR,
+		CreditsBlock lumine = new CreditsBlock(false, Window.SHPX_COLOR,
 				"Music:",
-				Icons.KRISTJAN.get(),
-				"Kristjan Haaristo",
-				"youtube.com/@kristjan...",
-				"https://www.youtube.com/@kristjanthomashaaristo");
-		kristjan.setRect(alex.right() - colWidth/4f, alex.bottom() + 5, colWidth/2f, 0);
-		content.add(kristjan);
+				Icons.LUMINE.get(),
+				"Lumine Haaristo",
+				"youtube.com/@Lumine...",
+				"https://www.youtube.com/@LumineThomasHaaristo");
+		lumine.setRect(alex.right() - colWidth/4f, alex.bottom() + 5, colWidth/2f, 0);
+		content.add(lumine);
 
 		//*** Pixel Dungeon Credits ***
 
@@ -121,9 +121,9 @@ public class AboutScene extends PixelScene {
 				"watabou.itch.io",
 				"https://watabou.itch.io/");
 		if (landscape()){
-			wata.setRect(shpx.left(), kristjan.bottom() + 8, colWidth, 0);
+			wata.setRect(shpx.left(), lumine.bottom() + 8, colWidth, 0);
 		} else {
-			wata.setRect(shpx.left(), kristjan.bottom() + 8, colWidth, 0);
+			wata.setRect(shpx.left(), lumine.bottom() + 8, colWidth, 0);
 		}
 		content.add(wata);
 
@@ -229,7 +229,7 @@ public class AboutScene extends PixelScene {
 				"_Sheep bleating_ by _zachrau_\n" +
 				"_Lemon,Juicy,Squeeze,Fruit.wav_ by _Filipe Chagas_\n" +
 				"_Lemon,Squeeze,Squishy,Fruit.wav_ by _Filipe Chagas_",
-				"www.freesound.org",
+				"freesound.org",
 				"https://www.freesound.org");
 		freesound.setRect(transifex.left()-10, transifex.bottom() + 8, colWidth+20, 0);
 		content.add(freesound);

@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,10 +41,11 @@ public class Rat extends Mob {
 
 	@Override
 	protected boolean act() {
-		if (alignment == Alignment.ENEMY
+		if (alignment != Alignment.ALLY
 				&& Dungeon.level.heroFOV[pos]
 				&& Dungeon.hero.armorAbility instanceof Ratmogrify){
 			alignment = Alignment.NEUTRAL;
+			if (enemy == Dungeon.hero) enemy = null;
 			if (state == SLEEPING) state = WANDERING;
 		}
 		return super.act();

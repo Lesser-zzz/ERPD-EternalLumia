@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -773,7 +773,7 @@ public enum Talent {
 				// 10/15%
 				if (Random.Int(20) < 1 + hero.pointsInTalent(RECALL_INSCRIPTION)){
 					Reflection.newInstance(cls).collect();
-					GLog.p("refunded!");
+					GLog.p(Messages.get(Talent.class, RECALL_INSCRIPTION.name() + ".refunded"));
 				}
 			}
 		}
@@ -792,7 +792,7 @@ public enum Talent {
 				// 10/15%
 				if (Random.Int(20) < 1 + hero.pointsInTalent(RECALL_INSCRIPTION)){
 					Reflection.newInstance(cls).collect();
-					GLog.p("refunded!");
+					GLog.p(Messages.get(Talent.class, RECALL_INSCRIPTION.name() + ".refunded"));
 				}
 			}
 		}

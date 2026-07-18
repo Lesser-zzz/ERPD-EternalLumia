@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -345,6 +345,7 @@ public class DriedRose extends Artifact {
 		
 		if (ghost != null){
 			ghost.updateRose();
+			ghost.HP = Math.min(ghost.HP+8, ghost.HT);
 		}
 
 		return super.upgrade();
@@ -418,6 +419,9 @@ public class DriedRose extends Artifact {
 					while (partialCharge > 1) {
 						ghost.HP++;
 						partialCharge--;
+						if (ghost.HP == ghost.HT){
+							partialCharge = 0;
+						}
 					}
 				} else {
 					partialCharge = 0;
@@ -502,7 +506,7 @@ public class DriedRose extends Artifact {
 				return false;
 			} if ( rose.level() >= rose.levelCap ){
 				GLog.i( Messages.get(this, "no_room") );
-				hero.spendAndNext(TIME_TO_PICK_UP);
+				hero.spendAndNext(pickupDelay());
 				return true;
 			} else {
 
@@ -515,7 +519,7 @@ public class DriedRose extends Artifact {
 
 				Sample.INSTANCE.play( Assets.Sounds.DEWDROP );
 				GameScene.pickUp(this, pos);
-				hero.spendAndNext(TIME_TO_PICK_UP);
+				hero.spendAndNext(pickupDelay());
 				return true;
 
 			}
@@ -580,6 +584,10 @@ public class DriedRose extends Artifact {
 		private void updateRose(){
 			if (rose == null) {
 				rose = Dungeon.hero.belongings.getItem(DriedRose.class);
+				if (rose != null) {
+					rose.ghost = this;
+					rose.ghostID = id();
+				}
 			}
 			
 			//same dodge as the hero

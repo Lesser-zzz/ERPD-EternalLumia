@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,6 +103,10 @@ abstract public class Weapon extends KindOfWeapon {
 
 		public int damageFactor(int dmg){
 			return Math.round(dmg * damageFactor);
+		}
+
+		public float damageFactor(float dmg){
+			return dmg * damageFactor;
 		}
 
 		public float delayFactor(float dly){

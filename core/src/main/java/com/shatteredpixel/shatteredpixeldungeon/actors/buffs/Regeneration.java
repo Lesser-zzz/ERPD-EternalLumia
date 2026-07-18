@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.ChaliceOfBlood;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.ChaoticCenser;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.SaltCube;
+import com.shatteredpixel.shatteredpixeldungeon.levels.VaultLevel;
 import com.watabou.utils.Bundle;
 
 public class Regeneration extends Buff {
@@ -112,6 +113,9 @@ public class Regeneration extends Buff {
 	public static boolean regenOn(){
 		LockedFloor lock = Dungeon.hero.buff(LockedFloor.class);
 		if (lock != null && !lock.regenOn()){
+			return false;
+		}
+		if (Dungeon.level instanceof VaultLevel){
 			return false;
 		}
 		return true;

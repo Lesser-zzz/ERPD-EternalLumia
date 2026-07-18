@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ import com.watabou.noosa.BitmapText;
 import com.watabou.noosa.Camera;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.audio.Music;
+import com.watabou.utils.DeviceCompat;
 import com.watabou.utils.GameMath;
 import com.watabou.utils.RectF;
 
@@ -147,7 +148,7 @@ public class RankingsScene extends PixelScene {
 		btnExit.setPos( Camera.main.width - btnExit.width() - insets.right, insets.top );
 		add( btnExit );
 
-		float left = insets.left + (PixelScene.landscape() ? 10 : 0);
+		float left = insets.left + (PixelScene.landscape() && !DeviceCompat.isDesktop() ? 10 : 0);
 
 		if (Rankings.INSTANCE.latestDaily != null) {
 			IconButton btnDailies = new IconButton(Icons.CALENDAR.get()) {

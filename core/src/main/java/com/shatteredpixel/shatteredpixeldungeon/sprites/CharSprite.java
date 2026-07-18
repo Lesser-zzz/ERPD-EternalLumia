@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -689,6 +689,27 @@ public class CharSprite extends MovieClip implements Tweener.Listener, MovieClip
 	public void hideAlert() {
 		synchronized (EmoIcon.class) {
 			if (emo instanceof EmoIcon.Alert) {
+				emo.killAndErase();
+				emo = null;
+			}
+		}
+	}
+
+	public void showInvestigate() {
+		synchronized (EmoIcon.class) {
+			if (!(emo instanceof EmoIcon.Investigate)) {
+				if (emo != null) {
+					emo.killAndErase();
+				}
+				emo = new EmoIcon.Investigate(this);
+				emo.visible = visible;
+			}
+		}
+	}
+
+	public void hideInvestigate() {
+		synchronized (EmoIcon.class) {
+			if (emo instanceof EmoIcon.Investigate) {
 				emo.killAndErase();
 				emo = null;
 			}

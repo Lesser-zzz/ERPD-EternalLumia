@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -39,8 +40,10 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.NecromancerSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.SkeletonSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.BArray;
 import com.watabou.utils.Bundle;
+import com.watabou.utils.Callback;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
@@ -171,6 +174,7 @@ public class Necromancer extends Mob {
 
 			if (sprite.visible || mySkeleton.sprite.visible) {
 				sprite.parent.add(new Beam.HealthRay(sprite.center(), mySkeleton.sprite.center()));
+				Sample.INSTANCE.play( Assets.Sounds.RAY );
 			}
 			
 			mySkeleton.HP = Math.min(mySkeleton.HP + mySkeleton.HT/5, mySkeleton.HT);
@@ -183,6 +187,7 @@ public class Necromancer extends Mob {
 
 			if (sprite.visible || mySkeleton.sprite.visible) {
 				sprite.parent.add(new Beam.HealthRay(sprite.center(), mySkeleton.sprite.center()));
+				Sample.INSTANCE.play( Assets.Sounds.RAY );
 			}
 			
 			Buff.affect(mySkeleton, Adrenaline.class, 3f);
@@ -192,7 +197,7 @@ public class Necromancer extends Mob {
 	}
 
 	public void summonMinion(){
-		if (Actor.findChar(summoningPos) != null) {
+		if (Actor.findChar(summoningPos) != null || !Dungeon.level.passable[summoningPos]) {
 
 			int pushPos = pos;
 			for (int c : PathFinder.NEIGHBOURS8) {
@@ -204,23 +209,25 @@ public class Necromancer extends Mob {
 				}
 			}
 
-			//no push if char is immovable
-			if (Char.hasProp(Actor.findChar(summoningPos), Property.IMMOVABLE)){
-				pushPos = pos;
-			}
-
 			//push enemy, or wait a turn if there is no valid pushing position
 			if (pushPos != pos) {
-				Char ch = Actor.findChar(summoningPos);
-				Actor.add( new Pushing( ch, ch.pos, pushPos ) );
 
-				ch.pos = pushPos;
-				Dungeon.level.occupyCell(ch );
+				Char ch = Actor.findChar(summoningPos);
+				//no push if char is immovable, move our skeleton instead
+				if (ch == null || Char.hasProp(ch, Property.IMMOVABLE)){
+					summoningPos = pushPos;
+				} else {
+					Actor.add(new Pushing(ch, ch.pos, pushPos));
+
+					ch.pos = pushPos;
+					Dungeon.level.occupyCell(ch);
+				}
 
 			} else {
 
+				//attempt to damage the blocker in addition to waiting
 				Char blocker = Actor.findChar(summoningPos);
-				if (blocker.alignment != alignment){
+				if (blocker != null && blocker.alignment != alignment){
 					blocker.damage( Random.NormalIntRange(2, 10), new SummoningBlockDamage() );
 					if (blocker == Dungeon.hero && !blocker.isAlive()){
 						Badges.validateDeathFromEnemyMagic();
@@ -236,17 +243,21 @@ public class Necromancer extends Mob {
 
 		summoning = firstSummon = false;
 
-		mySkeleton = new NecroSkeleton();
-		mySkeleton.pos = summoningPos;
-		GameScene.add( mySkeleton );
-		Dungeon.level.occupyCell( mySkeleton );
-		((NecromancerSprite)sprite).finishSummoning();
+		if (mySkeleton == null || !mySkeleton.isActive()) {
+			mySkeleton = new NecroSkeleton();
+			mySkeleton.pos = summoningPos;
+			GameScene.add(mySkeleton);
+			Dungeon.level.occupyCell(mySkeleton);
 
-		for (Buff b : buffs()){
-			if (b.revivePersists) {
-				Buff.affect(mySkeleton, b.getClass());
+			for (Buff b : buffs()){
+				if (b.revivePersists) {
+					Buff.affect(mySkeleton, b.getClass());
+				}
 			}
+		} else {
+			ScrollOfTeleportation.appear(mySkeleton, summoningPos);
 		}
+		((NecromancerSprite)sprite).finishSummoning();
 	}
 
 	public static class SummoningBlockDamage{}
@@ -322,10 +333,24 @@ public class Necromancer extends Mob {
 			} else if (enemySeen && mySkeleton != null){
 				
 				spend(TICK);
-				
+
+				boolean teleporting = false;
+				//teleport our skeleton to the enemy if..
+				//we can't see it
 				if (!fieldOfView[mySkeleton.pos]){
-					
-					//if the skeleton is not next to the enemy
+					teleporting = true;
+
+				//it has a relatively long path to reach the hero (e.g. it's blocked in a tunnelway)
+				} else if (!mySkeleton.canAttack(enemy)){
+					PathFinder.Path skelePath = Dungeon.findPath(mySkeleton, enemy.pos, Dungeon.level.passable, fieldOfView, true);
+
+					if (skelePath == null || skelePath.size() > 2*Dungeon.level.distance(pos, enemy.pos)){
+						teleporting = true;
+					}
+				}
+
+				if (teleporting){
+
 					//teleport them to the closest spot next to the enemy that can be seen
 					if (!Dungeon.level.adjacent(mySkeleton.pos, enemy.pos)){
 						int telePos = -1;
@@ -340,15 +365,15 @@ public class Necromancer extends Mob {
 						}
 						
 						if (telePos != -1){
-							
-							ScrollOfTeleportation.appear(mySkeleton, telePos);
-							mySkeleton.teleportSpend();
-							
-							if (sprite != null && sprite.visible){
+
+							if (sprite != null && sprite.visible) {
+								summoning = true;
+								summoningPos = telePos;
 								sprite.zap(telePos);
-								return false;
-							} else {
-								onZapComplete();
+								if (Dungeon.level.heroFOV[pos] || Dungeon.level.heroFOV[summoningPos]) {
+									Dungeon.hero.interrupt();
+								}
+								spend(TICK); //2 ticks total, it can't be the first summon
 							}
 						}
 					}
@@ -397,10 +422,6 @@ public class Necromancer extends Mob {
 			return 0;
 		}
 
-		private void teleportSpend(){
-			spend(TICK);
-		}
-		
 		public static class NecroSkeletonSprite extends SkeletonSprite{
 			
 			public NecroSkeletonSprite(){

@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.effects.ShadowBox;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.LostBackpack;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.SkeletonKey;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Document;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Notes;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
@@ -139,7 +140,7 @@ public class InterlevelScene extends PixelScene {
 					fadeTime = SLOW_FADE;
 				} else {
 					if (curTransition != null)  loadingDepth = curTransition.destDepth;
-					else                        loadingDepth = Dungeon.depth+1;
+					else                        loadingDepth = Dungeon.depth;
 					if (Statistics.deepestFloor >= loadingDepth) {
 						fadeTime = FAST_FADE;
 					} else if (loadingDepth == 6 || loadingDepth == 11
@@ -149,12 +150,13 @@ public class InterlevelScene extends PixelScene {
 				}
 				break;
 			case FALL:
-				loadingDepth = Dungeon.depth+1;
+				//not accurate, but you can't ever fall into a new region
+				loadingDepth = Dungeon.depth;
 				break;
 			case ASCEND:
 				fadeTime = FAST_FADE;
 				if (curTransition != null)  loadingDepth = curTransition.destDepth;
-				else                        loadingDepth = Dungeon.depth-1;
+				else                        loadingDepth = Dungeon.depth;
 				break;
 			case RETURN:
 				loadingDepth = returnDepth;
@@ -645,7 +647,12 @@ public class InterlevelScene extends PixelScene {
 			Level level = Dungeon.newLevel();
 			Dungeon.switchLevel( level, -1 );
 		} else {
-			Mob.holdAllies( Dungeon.level );
+			if (curTransition.destBranch != Dungeon.branch && Dungeon.depth >= 16 && Dungeon.depth <= 20) {
+				//FIXME avoids holding allies when entering city quest area, this is very sloppy though
+				// perhaps holding allies could be a property of the transition?
+			} else {
+				Mob.holdAllies(Dungeon.level);
+			}
 			Dungeon.saveAll();
 
 			Level level;
@@ -684,7 +691,12 @@ public class InterlevelScene extends PixelScene {
 	}
 
 	private void ascend() throws IOException {
-		Mob.holdAllies( Dungeon.level );
+		if (curTransition.destBranch != Dungeon.branch && Dungeon.depth >= 16 && Dungeon.depth <= 20) {
+			//FIXME avoids holding allies when entering city quest area, this is very sloppy though
+			// perhaps holding allies could be a property of the transition?
+		} else {
+			Mob.holdAllies(Dungeon.level);
+		}
 		Dungeon.saveAll();
 
 		Level level;
@@ -755,6 +767,11 @@ public class InterlevelScene extends PixelScene {
 			int pos = level.randomRespawnCell(null);
 			if (pos == -1) pos = level.entrance();
 			level.drop(new LostBackpack(), pos);
+
+			//need to reset key replacement tracking as well
+			if (Dungeon.hero.buff(SkeletonKey.KeyReplacementTracker.class) != null){
+				Dungeon.hero.buff(SkeletonKey.KeyReplacementTracker.class).clearDepth();
+			}
 
 		} else {
 			level = Dungeon.level;
