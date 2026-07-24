@@ -1,21 +1,22 @@
-# Hyunwoo Design
+# Hyunwoo
 
-## Identity
+## 캐릭터 정체성
 
-Frontline bruiser.
+현우는 근접 난전을 오래 버티며 상대를 압박하는 브루저다.
 
-## Strength
+## 플레이어 경험
 
-Strong in long fights.
+적에게 붙는 순간부터 긴장감이 시작된다.
 
-## Weakness
+도망치기보다 끝까지 싸우는 선택이 보상받아야 한다.
 
-Weak at ranged combat.
+## 반드시 구현할 것
 
-## Core Fantasy
+- 현우다운 근접전
+- 장기전에서 강해지는 느낌
 
-"Fight until the end."
+## 아직 구현하지 않을 것
 
-## Win Condition
-
-Stay alive long enough to overpower enemies.
+- 원작의 모든 스킬
+- 화려한 연출
+- 전용 그래픽
