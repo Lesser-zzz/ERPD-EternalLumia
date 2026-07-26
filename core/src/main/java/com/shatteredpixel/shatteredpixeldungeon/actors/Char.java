@@ -962,6 +962,23 @@ public abstract class Char extends Actor {
 			shield.activate();
 		}
 
+		// Hyunwoo - Dogfight stack when taking a hit
+		if (this instanceof Hero && src instanceof Char) {
+
+    		Hero hero = (Hero) this;
+
+    		if (hero.subClass == HeroSubClass.BERSERKER) {
+
+        		Dogfight dogfight = hero.buff(Dogfight.class);
+
+        		if (dogfight != null) {
+            		dogfight.onTakeDamage();
+        		}
+
+    		}
+
+		}
+		
 		int shielded = dmg;
 		dmg = ShieldBuff.processDamage(this, dmg, src);
 		shielded -= dmg;
