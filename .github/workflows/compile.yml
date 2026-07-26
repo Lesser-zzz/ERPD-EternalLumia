@@ -21,5 +21,14 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Compile
-        run: ./gradlew core:compileJava desktop:compileJava android:compileDebugJavaWithJavac
+      - name: Compile Core
+        run: ./gradlew core:compileJava
+
+      - name: Compile Desktop
+        run: ./gradlew desktop:compileJava
+
+      - name: Compile Android
+        run: ./gradlew android:compileDebugJavaWithJavac
+
+      - name: Package Desktop
+        run: ./gradlew desktop:distZip
