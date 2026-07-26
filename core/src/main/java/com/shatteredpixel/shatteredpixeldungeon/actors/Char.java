@@ -519,22 +519,6 @@ public abstract class Char extends Actor {
 
 			enemy.damage( effectiveDamage, this );
 
-			if (enemy instanceof Hero) {
-
-    			Hero hero = (Hero) enemy;
-
-    			if (hero.subClass == HeroSubClass.BERSERKER) {
-
-        			Dogfight dogfight = hero.buff(Dogfight.class);
-
-        			if (dogfight != null) {
-            			dogfight.onTakeDamage();
-        			}
-
-    			}
-
-			}
-
 			if (buff(FireImbue.class) != null)  buff(FireImbue.class).proc(enemy);
 			if (buff(FrostImbue.class) != null) buff(FrostImbue.class).proc(enemy);
 
