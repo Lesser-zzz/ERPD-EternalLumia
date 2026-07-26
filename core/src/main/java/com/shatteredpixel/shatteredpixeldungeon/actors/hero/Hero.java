@@ -1536,8 +1536,12 @@ public class Hero extends Char {
 
 		if (dogfight != null) {
 
-    		if (!dogfight.consumeReady()) {
-        		dogfight.onHitEnemy();
+    		// 명중했으므로 공격 스택 증가
+    		dogfight.onHitEnemy();
+
+    	// Ready 상태였다면 발동
+    	if (dogfight.isReady()) {
+        	dogfight.attackSuccess(this, enemy);
     		}
 
 		}
