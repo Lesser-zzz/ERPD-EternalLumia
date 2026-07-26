@@ -1532,13 +1532,13 @@ public class Hero extends Char {
 		default:
 		}
 		
-		return damage;
-
 		Dogfight dogfight = buff(Dogfight.class);
 
 		if (dogfight != null){
     		dogfight.onHitEnemy();
 		}
+		
+		return damage;
 		
 	}
 	
