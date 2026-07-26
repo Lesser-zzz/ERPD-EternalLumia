@@ -25,9 +25,10 @@ public class Dogfight extends Buff {
     private boolean ready = false;
 
     /**
-     * 공격 명중 시 호출
+     * 스택을 1 증가시킨다.
+     * Ready 상태에서는 더 이상 증가하지 않는다.
      */
-    public void onHitEnemy() {
+    private void addStack() {
 
         if (ready) {
             return;
@@ -42,20 +43,33 @@ public class Dogfight extends Buff {
     }
 
     /**
+     * 공격 명중 시 호출
+     */
+    public void onHitEnemy() {
+        addStack();
+    }
+
+    /**
      * 피격 시 호출
      * (멧돼지 전직 후에만 사용할 예정)
      */
     public void onTakeDamage() {
+        addStack();
+    }
 
-        if (ready) {
-            return;
+    /**
+     * Ready 상태를 소비한다.
+     * 성공적으로 소비했다면 true를 반환한다.
+     */
+    public boolean consumeReady() {
+
+        if (!ready) {
+            return false;
         }
 
-        dogfightStack++;
+        consume();
 
-        if (dogfightStack >= requiredHits) {
-            ready = true;
-        }
+        return true;
 
     }
 
@@ -67,21 +81,21 @@ public class Dogfight extends Buff {
     }
 
     /**
-     * 현재 요구치
+     * 현재 발동 요구치
      */
     public int getRequiredHits() {
         return requiredHits;
     }
 
     /**
-     * 도그파이트 준비 여부
+     * 현재 Ready 상태인지 반환
      */
     public boolean isReady() {
         return ready;
     }
 
     /**
-     * 레벨업 특성 등으로 요구치 감소
+     * 레벨업 특성 등으로 발동 요구치를 감소시킨다.
      */
     public void reduceRequirement(int amount) {
 
@@ -94,13 +108,12 @@ public class Dogfight extends Buff {
     }
 
     /**
-     * 도그파이트를 소비하고 초기화
-     * (다음 공격에서 추가 피해 + 회복 후 호출될 예정)
+     * 도그파이트를 소비하고 초기화한다.
      */
     public void consume() {
 
-        ready = false;
         dogfightStack = 0;
+        ready = false;
 
     }
 
