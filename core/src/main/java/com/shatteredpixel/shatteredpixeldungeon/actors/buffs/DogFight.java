@@ -6,7 +6,7 @@
  */
 
 
-public class Dogfight {
+public class Dogfight extends Buff {
 
     private int attackCounter;
 
