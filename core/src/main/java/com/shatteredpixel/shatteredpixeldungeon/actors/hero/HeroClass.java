@@ -185,6 +185,7 @@ public enum HeroClass {
 
 		new PotionOfHealing().identify();
 		new ScrollOfRage().identify();
+		Buff.affect(hero, Dogfight.class);
 	}
 
 	private static void initMage( Hero hero ) {
