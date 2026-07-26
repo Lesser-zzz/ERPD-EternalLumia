@@ -1534,8 +1534,12 @@ public class Hero extends Char {
 		
 		Dogfight dogfight = buff(Dogfight.class);
 
-		if (dogfight != null){
-    		dogfight.onHitEnemy();
+		if (dogfight != null) {
+
+    		if (!dogfight.consumeReady()) {
+        		dogfight.onHitEnemy();
+    		}
+
 		}
 		
 		return damage;
