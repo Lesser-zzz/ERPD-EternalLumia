@@ -1536,13 +1536,13 @@ public class Hero extends Char {
 
 		if (dogfight != null) {
 
-    		// 명중했으므로 공격 스택 증가
-    		dogfight.onHitEnemy();
-
-    	// Ready 상태였다면 발동
-    	if (dogfight.isReady()) {
-        	dogfight.attackSuccess(this, enemy);
+    		// 이미 Ready였다면 이번 공격으로 발동
+    		if (dogfight.isReady()) {
+        		dogfight.attackSuccess(this, enemy);
     		}
+
+    		// 이번 공격은 다음 사이클의 스택으로 계산
+    		dogfight.onHitEnemy();
 
 		}
 		
