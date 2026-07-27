@@ -73,6 +73,7 @@ public class Dogfight extends Buff {
         dogfightStack++;
 
         if (dogfightStack >= requiredHits) {
+            dogfightStack = requiredHits;
             ready = true;
         }   
 
@@ -233,10 +234,8 @@ public class Dogfight extends Buff {
 
         }
 
-    return Messages.get(this, "desc",
-            dogfightStack,
-            requiredHits);
-}
+        return Messages.get(this, "desc");
+    }
 
     /**
      * 레벨업 특성 등으로
