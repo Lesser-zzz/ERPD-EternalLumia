@@ -20,10 +20,10 @@ jobs:
           java-version: 17
 
       - name: Build desktop
-        run: .\gradlew.bat desktop:installDist
+        run: gradlew.bat desktop:jpackageImage
 
       - name: Upload desktop build
         uses: actions/upload-artifact@v4
         with:
           name: ERPD-desktop
-          path: desktop/build/install/
+          path: desktop/build/jpackage/
