@@ -20,7 +20,7 @@ jobs:
           java-version: 17
 
       - name: Build desktop
-        run: gradlew.bat desktop:jpackageImage
+        run: .\gradlew.bat desktop:jpackageImage
 
       - name: Upload desktop build
         uses: actions/upload-artifact@v4
