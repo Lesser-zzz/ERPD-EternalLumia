@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.particles.Speck;
+import com.watabou.utils.Bundle;
 
 public class Dogfight extends Buff {
 
@@ -227,14 +228,14 @@ public class Dogfight extends Buff {
             if (hero.subClass == HeroSubClass.BERSERKER) {
 
                 return Messages.get(this, "boar_desc",
-                        dogfightStack,
                         requiredHits);
 
             }
 
         }
 
-        return Messages.get(this, "desc");
+        return Messages.get(this, "desc",
+                requiredHits);    
     }
 
     /**
@@ -255,6 +256,38 @@ public class Dogfight extends Buff {
         }
 
     }
+
+    //게임 껏다 켜도 스택이 유지되도록 해야함
+
+    private static final String STACK = "dogfight_stack";
+    private static final String REQUIRED = "dogfight_required";
+    private static final String READY = "dogfight_ready";
+
+
+    @Override
+    public void storeInBundle(Bundle bundle) {
+
+        super.storeInBundle(bundle);
+
+        bundle.put(STACK, dogfightStack);
+        bundle.put(REQUIRED, requiredHits);
+        bundle.put(READY, ready);
+
+    }
+
+
+    @Override
+    public void restoreFromBundle(Bundle bundle) {
+
+        super.restoreFromBundle(bundle);
+
+        dogfightStack = bundle.getInt(STACK);
+        requiredHits = bundle.getInt(REQUIRED);
+        ready = bundle.getBoolean(READY);
+
+    }
+
+    
 
     /**
      * 도그파이트 소비
