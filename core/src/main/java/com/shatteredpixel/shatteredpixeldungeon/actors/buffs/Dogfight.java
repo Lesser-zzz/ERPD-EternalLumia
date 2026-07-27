@@ -23,10 +23,13 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
+import com.watabou.noosa.BitmapText;
+import com.watabou.noosa.Visual;
 import com.watabou.utils.Bundle;
 
 public class Dogfight extends Buff {
@@ -59,6 +62,23 @@ public class Dogfight extends Buff {
         }
 
         return Integer.toString(dogfightStack);
+    }
+
+    @Override
+    public Visual secondaryVisual() {
+
+        BitmapText txt = new BitmapText(PixelScene.pixelFont);
+
+        if (ready) {
+            txt.text("!");
+        } else {
+            txt.text(Integer.toString(dogfightStack));
+        }
+
+        txt.hardlight(CharSprite.POSITIVE);
+        txt.measure();
+
+        return txt;
     }
 
     /**
