@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
@@ -344,7 +345,7 @@ public class BuffIndicator extends Component {
 		public void updateIcon(){
 			((BuffIcon)icon).refresh(buff);
 			//round up to the nearest pixel if <50% faded, otherwise round down
-			if (!large || buff.iconTextDisplay().isEmpty()) {
+			if ((!large && !(buff instanceof Dogfight)) || buff.iconTextDisplay().isEmpty()) {
 				text.visible = false;
 				grey.visible = true;
 				float fadeHeight = GameMath.gate(0, buff.iconFadePercent(), 1) * icon.height();
