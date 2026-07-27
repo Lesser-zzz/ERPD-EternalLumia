@@ -22,6 +22,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.particles.Speck;
@@ -42,6 +43,22 @@ public class Dogfight extends Buff {
     // 발동 준비 완료 여부
     private boolean ready = false;
 
+    // icon 추가
+    @Override
+    public int icon() {
+        return BuffIndicator.COMBO;
+    }
+
+    @Override
+    public String iconTextDisplay() {
+
+        if (ready) {
+            return "!";
+        }
+
+        return Integer.toString(dogfightStack);
+    }
+
     /**
      * 스택 증가
      * Ready 상태에서는 더 이상 증가하지 않는다.
@@ -56,7 +73,9 @@ public class Dogfight extends Buff {
 
         if (dogfightStack >= requiredHits) {
             ready = true;
-        }
+        }   
+
+        BuffIndicator.refreshHero();
     }
 
     /**
@@ -220,6 +239,8 @@ public class Dogfight extends Buff {
 
         dogfightStack = 0;
         ready = false;
+
+        BuffIndicator.refreshHero();
 
     }
 
