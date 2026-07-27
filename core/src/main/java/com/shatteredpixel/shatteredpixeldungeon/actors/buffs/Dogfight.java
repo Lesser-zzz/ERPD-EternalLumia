@@ -17,10 +17,12 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.audio.Sample;
 
 public class Dogfight extends Buff {
 
@@ -93,6 +95,11 @@ public class Dogfight extends Buff {
         if (!ready) {
             return;
         }
+
+        // Dogfight 발동 효과음
+        Sample.INSTANCE.play(
+                Assets.Sounds.HIT_STRONG
+        );
 
         int bonusDamage = calculateBonusDamage(hero);
 
