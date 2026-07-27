@@ -17,6 +17,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
@@ -134,7 +135,11 @@ public class Dogfight extends Buff {
 
         hero.HP = Math.min(hero.HT, hero.HP + amount);
 
-        hero.sprite.showStatus(CharSprite.POSITIVE, "+" + amount);
+        hero.sprite.showStatusWithIcon(
+            CharSprite.POSITIVE,
+            Integer.toString(amount),
+            FloatingText.HEALING
+        );
 
     }
     /**
