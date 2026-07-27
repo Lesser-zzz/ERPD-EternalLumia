@@ -18,11 +18,13 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
+import com.watabou.noosa.particles.Speck;
 
 public class Dogfight extends Buff {
 
@@ -103,6 +105,12 @@ public class Dogfight extends Buff {
 
         if (bonusDamage > 0) {
             enemy.damage(bonusDamage, hero);
+
+            CellEmitter.center(enemy.pos).start(
+                    Speck.factory(Speck.YELLOW_LIGHT),
+                    0.15f,
+                    3
+            );
         }
         
     
@@ -118,11 +126,17 @@ public class Dogfight extends Buff {
 
     private void playActivationEffect(Hero hero) {
 
-    Sample.INSTANCE.play(
-            Assets.Sounds.HIT_STRONG
-    );
+        Sample.INSTANCE.play(
+                Assets.Sounds.HIT_STRONG
+        );
 
-    hero.sprite.flash();
+        hero.sprite.flash();
+
+        CellEmitter.center(hero.pos).start(
+                Speck.factory(Speck.YELLOW_LIGHT),
+                0.1f,
+                8
+            );
 
     }
 
