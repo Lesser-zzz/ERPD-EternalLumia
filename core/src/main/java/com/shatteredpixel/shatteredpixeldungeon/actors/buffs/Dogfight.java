@@ -96,10 +96,8 @@ public class Dogfight extends Buff {
             return;
         }
 
-        // Dogfight 발동 효과음
-        Sample.INSTANCE.play(
-                Assets.Sounds.HIT_STRONG
-        );
+         // Dogfight 발동 연출
+        playActivationEffect(hero);
 
         int bonusDamage = calculateBonusDamage(hero);
 
@@ -114,6 +112,18 @@ public class Dogfight extends Buff {
         GLog.p(Messages.get(this, "activated"));
 
         consume();
+    }
+
+    // Dogfight 발동 연출 모음
+
+    private void playActivationEffect(Hero hero) {
+
+    Sample.INSTANCE.play(
+            Assets.Sounds.HIT_STRONG
+    );
+
+    hero.sprite.flash();
+
     }
 
     /**
