@@ -58,6 +58,15 @@ public class Dogfight extends Buff {
 
         return Integer.toString(dogfightStack);
     }
+// 독파 설명
+    @Override
+    public String desc() {
+
+        return Messages.get(this, "desc",
+                requiredHits
+        );
+
+    }
 
     /**
      * 스택 증가
