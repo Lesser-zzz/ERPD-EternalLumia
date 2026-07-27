@@ -17,6 +17,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
@@ -57,15 +58,6 @@ public class Dogfight extends Buff {
         }
 
         return Integer.toString(dogfightStack);
-    }
-// 독파 설명
-    @Override
-    public String desc() {
-
-        return Messages.get(this, "desc",
-                requiredHits
-        );
-
     }
 
     /**
@@ -221,6 +213,30 @@ public class Dogfight extends Buff {
     public boolean isReady() {
         return ready;
     }
+
+
+    // 독파 설명    
+    @Override
+    public String desc() {
+
+        if (target instanceof Hero) {
+
+            Hero hero = (Hero) target;
+
+            if (hero.subClass == HeroSubClass.BERSERKER) {
+
+                return Messages.get(this, "boar_desc",
+                        dogfightStack,
+                        requiredHits);
+
+            }
+
+        }
+
+    return Messages.get(this, "desc",
+            dogfightStack,
+            requiredHits);
+}
 
     /**
      * 레벨업 특성 등으로
