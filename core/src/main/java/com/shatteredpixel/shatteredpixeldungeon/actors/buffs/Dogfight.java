@@ -87,6 +87,11 @@ public class Dogfight extends Buff {
      */
     private void addStack() {
 
+        if (activatedThisAttack) {
+            activatedThisAttack = false;
+            return;
+        }
+
         if (ready) {
             return;
         }
@@ -129,6 +134,8 @@ public class Dogfight extends Buff {
         consume();
         return true;
     }
+//독파 공격 시 바로 스택 1 되는 걸 막기위한 무시로그
+    private boolean activatedThisAttack = false;
 
     /**
      * Ready 상태의 일반 공격이
@@ -139,6 +146,8 @@ public class Dogfight extends Buff {
         if (!ready) {
             return;
         }
+//중복 방지
+        activatedThisAttack = true;
 
          // Dogfight 발동 연출
         playActivationEffect(hero);
