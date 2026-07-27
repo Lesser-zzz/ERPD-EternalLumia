@@ -64,7 +64,7 @@ public class Dogfight extends Buff {
         return Integer.toString(dogfightStack);
     }
 
-    @Override
+
     public Visual secondaryVisual() {
 
         BitmapText txt = new BitmapText(PixelScene.pixelFont);
