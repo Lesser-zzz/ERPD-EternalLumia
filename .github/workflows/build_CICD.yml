@@ -1,0 +1,73 @@
+name: ERPD CI/CD Build
+
+on:
+  # 1. 평소 푸시나 PR 시에는 가볍게 컴파일 검사만 수행 (시간 절약)
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+    
+  # 2. 필요할 때 깃허브 웹(Actions 탭)에서 직접 골라서 빌드할 수 있는 수동 트리거
+  workflow_dispatch:
+    inputs:
+      build_target:
+        description: '빌드할 타겟 플랫폼 선택'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none (컴파일 검사만)
+          - desktop
+          - android
+          - all
+      build_type:
+        description: '빌드 타입 선택 (디버그 또는 릴리스)'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+
+jobs:
+  build:
+    # 윈도우용 .exe(.jpackageImage)와 안드로이드 빌드를 모두 소화하기 위해 windows-latest 사용
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    # 평소 푸시/PR 시: 가벼운 컴파일 검사만 수행 (윈도우 환경이므로 gradlew.bat 사용)
+    - name: Compile check (Fast)
+      run: .\gradlew.bat compileJava
+
+    # --- [수동 빌드: 데스크톱 (.exe / jpackageImage)] ---
+    - name: Build Desktop
+      if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'desktop' || inputs.build_target == 'all')
+      run: .\gradlew.bat desktop:jpackageImage
+
+    # --- [수동 빌드: 안드로이드 (.apk)] ---
+    - name: Build Android (Debug)
+      if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all') && inputs.build_type == 'debug'
+      run: .\gradlew.bat android:assembleDebug
+
+    - name: Build Android (Release)
+      if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all') && inputs.build_type == 'release'
+      run: .\gradlew.bat android:assembleRelease
+
+    # --- [결과물(Artifacts) 업로드] ---
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      if: github.event_name == 'workflow_dispatch' && inputs.build_target != 'none (컴파일 검사만)' && inputs.build_target != 'none'
+      with:
+        name: erpd-${{ inputs.build_target }}-${{ inputs.build_type }}-output
+        path: |
+          desktop/build/jpackage/
+          android/build/outputs/apk/debug/*.apk
+          android/build/outputs/apk/release/*.apk
