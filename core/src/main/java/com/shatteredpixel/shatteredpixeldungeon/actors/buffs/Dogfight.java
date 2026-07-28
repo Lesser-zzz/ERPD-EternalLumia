@@ -266,25 +266,30 @@ public class Dogfight extends Buff {
         return Messages.get(this, "desc",
                 requiredHits);    
     }
+   
 
     /**
-     * 레벨업 특성 등으로
-     * 발동 요구치를 감소시킨다.
-     */
-    public void reduceRequirement(int amount) {
-
-        requiredHits -= amount;
-
-        if (requiredHits < 1) {
-            requiredHits = 1;
-        }
-
-        // 이미 현재 스택이 요구치를 만족하면 즉시 Ready
-        if (!ready && dogfightStack >= requiredHits) {
-            ready = true;
-        }
-
-    }
+	 * 영웅이 찍은 DOGFIGHT 특성 레벨을 바탕으로 발동 요구치를 동적으로 계산
+	 */
+	public void updateRequirementFromTalent(Hero hero) {
+		if (hero == null) return;
+		
+		int baseRequirement = 10; // 기본 필요 타격 횟수
+		
+		// 영웅이 찍은 T2 도그파이트 특성 포인트 (0, 1, 2)
+		int talentPoints = hero.pointsInTalent(com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent.DOGFIGHT);
+		
+		// 특성 1레벨당 2씩 감소 (최대 4 감소하여 6회에 발동 등 원하는 밸런스 설정)
+		int reduction = talentPoints * 2;
+		
+		requiredHits = Math.max(4, baseRequirement - reduction);
+		
+		// 요구치가 줄어들었을 때 현재 스택이 만족한다면 즉시 Ready
+		if (!ready && dogfightStack >= requiredHits) {
+			    dogfightStack = requiredHits;
+			    ready = true;
+		    }
+	    }
 
     //게임 껏다 켜도 스택이 유지되도록 해야함
 
