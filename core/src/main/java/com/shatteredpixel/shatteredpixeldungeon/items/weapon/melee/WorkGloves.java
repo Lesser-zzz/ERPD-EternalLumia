@@ -13,6 +13,7 @@ public class WorkGloves extends MeleeWeapon {
 
         tier = 1;
         DLY = 0.5f; // 핵심! 공격 속도 2배 -> 도그파이트 스택이 2배로 빨리 쌓임
+        ACCURACY = 1.2f // 테스팅 체감 위한 명중률 상승 보정
         
         bones = false;
     }
@@ -23,12 +24,5 @@ public class WorkGloves extends MeleeWeapon {
     public int max(int lvl) {
         return Math.round(2.5f * (tier + 1)) + lvl * Math.round(0.5f * (tier + 1));
     }
-
-    // (추가) 현우의 인파이터 컨셉을 살리기 위한 명중률 1.2배 보너스
-    @Override
-    public float accuracyFactor(Hero hero) {
-        return 1.2f;
-    }
-
    
 }
