@@ -61,13 +61,20 @@ jobs:
       if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all') && inputs.build_type == 'release'
       run: .\gradlew.bat android:assembleRelease
 
-    # --- [결과물(Artifacts) 업로드] ---
-    - name: Upload Artifacts
+    # --- [결과물(Artifacts) 업로드: 데스크톱] ---
+    - name: Upload Desktop Artifact
       uses: actions/upload-artifact@v4
-      if: github.event_name == 'workflow_dispatch' && inputs.build_target != 'none (컴파일 검사만)' && inputs.build_target != 'none'
+      if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'desktop' || inputs.build_target == 'all')
       with:
-        name: erpd-${{ inputs.build_target }}-${{ inputs.build_type }}-output
+        name: erpd-desktop-${{ inputs.build_type }}
+        path: desktop/build/jpackage/
+
+    # --- [결과물(Artifacts) 업로드: 안드로이드] ---
+    - name: Upload Android Artifact
+      uses: actions/upload-artifact@v4
+      if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all')
+      with:
+        name: erpd-android-${{ inputs.build_type }}
         path: |
-          desktop/build/jpackage/
           android/build/outputs/apk/debug/*.apk
           android/build/outputs/apk/release/*.apk
