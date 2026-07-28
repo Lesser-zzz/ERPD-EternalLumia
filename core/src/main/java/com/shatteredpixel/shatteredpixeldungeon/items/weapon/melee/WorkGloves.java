@@ -13,7 +13,6 @@ public class WorkGloves extends MeleeWeapon {
 
         tier = 1;
         DLY = 0.5f; // 핵심! 공격 속도 2배 -> 도그파이트 스택이 2배로 빨리 쌓임
-        ACCURACY = 1.2f; // 테스팅 체감 위한 명중률 상승 보정
         
         bones = false;
     }
