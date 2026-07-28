@@ -12,7 +12,7 @@ allprojects {
 
     ext {
         appName = 'Eternal Lumia'
-        appPackageName = 'com.shatteredpixel.shatteredpixeldungeon'
+        appPackageName = 'erpd.etnernallumia'
 
         appVersionCode = 1
         appVersionName = '0.0.1'
