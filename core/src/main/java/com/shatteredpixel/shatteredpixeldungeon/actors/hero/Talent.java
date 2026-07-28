@@ -98,7 +98,7 @@ public enum Talent {
 	//Warrior T1
 	HEARTY_MEAL(0), VETERANS_INTUITION(1), PROVOKED_ANGER(2), IRON_WILL(3),
 	//Warrior T2
-	IRON_STOMACH(4), LIQUID_WILLPOWER(5), RUNIC_TRANSFERENCE(6), LETHAL_MOMENTUM(7), IMPROVISED_PROJECTILES(8),
+	IRON_STOMACH(4), LIQUID_WILLPOWER(5), RUNIC_TRANSFERENCE(6), LETHAL_MOMENTUM(7), DOGFIGHT(8),
 	//Warrior T3
 	HOLD_FAST(9, 3), STRONGMAN(10, 3),
 	//Berserker T3
@@ -499,6 +499,17 @@ public enum Talent {
 		if (talent == IRON_WILL && hero.heroClass != HeroClass.WARRIOR){
 			Buff.affect(hero, BrokenSeal.WarriorShield.class);
 		}
+
+		// 현우 도그파이트 특성 포인트에 따라 발동 요구치 감소 (예: 포인트당 2씩 감소 등)
+		if (talent == DOGFIGHT) {
+				Dogfight dogfight = hero.buff(Dogfight.class);
+				if (dogfight != null) {
+					// 예시: 찍은 포인트(1레벨 또는 2레벨)에 맞춰 요구치 감소량을 계산
+					// 기본 요구치 10에서 특성 투자에 따라 줄어들게 설정
+					int reduction = hero.pointsInTalent(DOGFIGHT) * 1; // 포인트당 1 감소 (원하는 수치로 조절 가능)
+					// 혹은 변화량만큼 직접 reduceRequirement 호출
+				}
+			}
 
 		if (talent == VETERANS_INTUITION && hero.pointsInTalent(VETERANS_INTUITION) == 2){
 			if (hero.belongings.armor() != null && !ShardOfOblivion.passiveIDDisabled())  {
@@ -1003,7 +1014,7 @@ public enum Talent {
 		//tier 2
 		switch (cls){
 			case WARRIOR: default:
-				Collections.addAll(tierTalents, IRON_STOMACH, LIQUID_WILLPOWER, RUNIC_TRANSFERENCE, LETHAL_MOMENTUM, IMPROVISED_PROJECTILES);
+				Collections.addAll(tierTalents, IRON_STOMACH, LIQUID_WILLPOWER, RUNIC_TRANSFERENCE, LETHAL_MOMENTUM, DOGFIGHT);
 				break;
 			case MAGE:
 				Collections.addAll(tierTalents, ENERGIZING_MEAL, INSCRIBED_POWER, WAND_PRESERVATION, ARCANE_VISION, SHIELD_BATTERY);
