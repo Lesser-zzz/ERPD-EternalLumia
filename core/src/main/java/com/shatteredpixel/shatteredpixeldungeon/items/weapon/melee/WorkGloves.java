@@ -6,7 +6,7 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
 public class WorkGloves extends MeleeWeapon {
 
-    {
+    public WorkGloves() {
         image = ItemSpriteSheet.GLOVES;
         hitSound = Assets.Sounds.HIT;
         hitSoundPitch = 1.3f; // 찰진 펀치 사운드
