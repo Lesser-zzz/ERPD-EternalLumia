@@ -34,7 +34,7 @@ import com.watabou.utils.Bundle;
 
 public class Dogfight extends Buff {
 
-    {
+    public Dogfight() {
         type = buffType.POSITIVE;
         announced = true;
     }
