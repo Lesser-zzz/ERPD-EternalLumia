@@ -12,9 +12,9 @@ allprojects {
 
     ext {
         appName = 'Eternal Lumia'
-        appPackageName = 'erpd.etnernallumia'
+        appPackageName = 'erpd.eternallumia'
 
-        appVersionCode = 1
+        appVersionCode = 896
         appVersionName = '0.0.1'
 
         appJavaCompatibility = JavaVersion.VERSION_11
