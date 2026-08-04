@@ -75,7 +75,7 @@ public class HeroSprite extends CharSprite {
 
 		TextureFilm film;
 		if (isWarrior) {
-			// [현우 전용 로직] 60x60 해상도 적용 및 방어구/프레임 에러 방지
+			// [현우 전용 로직] 60x60 해상도 적용 및 방어구 에러 방지
 			SmartTexture tex = TextureCache.get( Dungeon.hero.heroClass.spritesheet() );
 			TextureFilm warriorTiers = new TextureFilm( tex, tex.width, fh );
 			
@@ -83,24 +83,18 @@ public class HeroSprite extends CharSprite {
 			int safeTier = 0; 
 			film = new TextureFilm( warriorTiers, safeTier, fw, fh );
 			
-			// 준비된 프레임이 모자라서 튕기는 것을 막는 안전장치
-			int maxF = film.frames() - 1;
-			int fIdle = 0;
-			int fRun1 = Math.min(1, maxF);
-			int fRun2 = Math.min(2, maxF);
-			int fAttack = Math.min(3, maxF);
-
+			// 현재 60x60 이미지는 1장뿐이므로, 튕김 방지를 위해 모든 동작을 0번 프레임으로 고정
 			idle = new Animation( 2, true );
-			idle.frames( film, fIdle );
+			idle.frames( film, 0 );
 			
 			run = new Animation( 10, true );
-			run.frames( film, fRun1, fRun2 );
+			run.frames( film, 0 );
 			
 			die = new Animation( 2, false );
-			die.frames( film, fIdle ); // 죽는 모션이 없다면 일단 대기 모션으로 땜빵
+			die.frames( film, 0 ); 
 			
 			attack = new Animation( 15, false );
-			attack.frames( film, fAttack, fIdle );
+			attack.frames( film, 0 );
 			
 			zap = attack.clone();
 			operate = idle.clone();
