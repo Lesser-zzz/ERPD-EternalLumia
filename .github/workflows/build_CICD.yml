@@ -1,13 +1,11 @@
 name: ERPD CI/CD Build
 
 on:
-  # 1. 평소 푸시나 PR 시에는 가볍게 컴파일 검사만 수행 (시간 절약)
   push:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
     
-  # 2. 필요할 때 깃허브 웹(Actions 탭)에서 직접 골라서 빌드할 수 있는 수동 트리거
   workflow_dispatch:
     inputs:
       build_target:
@@ -29,13 +27,46 @@ on:
           - debug
           - release
 
+# 봇이 CHANGELOG.md를 수정하고 Push할 수 있도록 쓰기 권한 추가
+permissions:
+  contents: write
+
 jobs:
   build:
-    # 윈도우용 .exe(.jpackageImage)와 안드로이드 빌드를 모두 소화하기 위해 windows-latest 사용
     runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2 # 커밋 메시지를 정확히 읽어오기 위해 설정
+
+    # --- [체인지로그 자동화 스텝 추가] ---
+    - name: Update Changelog Automatically
+      if: github.event_name == 'push'
+      shell: bash
+      run: |
+        # 한국 시간(KST) 및 방금 푸시된 커밋 메시지 추출
+        CURRENT_TIME=$(TZ='Asia/Seoul' date +'%Y-%m-%d %H:%M:%S KST')
+        COMMIT_MSG=$(git log -1 --pretty=format:"%B")
+        
+        # 파일이 없으면 생성
+        if [ ! -f CHANGELOG.md ]; then touch CHANGELOG.md; fi
+        
+        # 임시 파일에 새 로그를 쓰고 기존 로그를 아래에 덧붙임
+        echo "### 🕒 $CURRENT_TIME" > temp_changelog.md
+        echo "$COMMIT_MSG" >> temp_changelog.md
+        echo "" >> temp_changelog.md
+        echo "---" >> temp_changelog.md
+        echo "" >> temp_changelog.md
+        cat CHANGELOG.md >> temp_changelog.md
+        mv temp_changelog.md CHANGELOG.md
+        
+        # 봇 계정으로 변경사항 자동 커밋 및 푸시 (무한루프 방지를 위해 [skip ci] 태그 추가)
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add CHANGELOG.md
+        git commit -m "docs: 체인지로그 자동 업데이트 [skip ci]" || echo "No changes to commit"
+        git push
 
     - name: Set up JDK
       uses: actions/setup-java@v4
@@ -43,16 +74,13 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    # 평소 푸시/PR 시: 가벼운 컴파일 검사만 수행 (윈도우 환경이므로 gradlew.bat 사용)
     - name: Compile check (Fast)
       run: .\gradlew.bat compileJava
 
-    # --- [수동 빌드: 데스크톱 (.exe / jpackageImage)] ---
     - name: Build Desktop
       if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'desktop' || inputs.build_target == 'all')
       run: .\gradlew.bat desktop:jpackageImage
 
-    # --- [수동 빌드: 안드로이드 (.apk)] ---
     - name: Build Android (Debug)
       if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all') && inputs.build_type == 'debug'
       run: .\gradlew.bat android:assembleDebug
@@ -61,7 +89,6 @@ jobs:
       if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all') && inputs.build_type == 'release'
       run: .\gradlew.bat android:assembleRelease
 
-    # --- [결과물(Artifacts) 업로드: 데스크톱] ---
     - name: Upload Desktop Artifact
       uses: actions/upload-artifact@v4
       if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'desktop' || inputs.build_target == 'all')
@@ -69,7 +96,6 @@ jobs:
         name: erpd-desktop-${{ inputs.build_type }}
         path: desktop/build/jpackage/
 
-    # --- [결과물(Artifacts) 업로드: 안드로이드] ---
     - name: Upload Android Artifact
       uses: actions/upload-artifact@v4
       if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all')
