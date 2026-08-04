@@ -1982,7 +1982,10 @@ public class Hero extends Char {
 
 	// [추가] 사지방 테스트용 즉시 레벨업 치트 함수
 	public void debugLevelUp() {
-    	this.earnExp( this.maxExp() - this.exp );
+    	// 다음 레벨업에 필요한 경험치까지의 부족분을 채우면서 경험치 획득 메서드를 우회하거나,
+    	// 혹은 안전하게 경험치를 직접 밀어넣고 레벨을 올립니다.
+    	this.exp = this.maxExp(); 
+    	this.lvlUp(); // 아까는 에러 났지만, 이건 Hero 클래스 내부 함수이므로 여기서 호출하는 건 정상 작동합니다!
     	this.HP = this.HT; 
 	}
 	
