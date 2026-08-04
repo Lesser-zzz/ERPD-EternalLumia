@@ -1982,7 +1982,7 @@ public class Hero extends Char {
 
 	// [추가] 사지방 테스트용 즉시 레벨업 치트 함수
 	public void debugLevelUp() {
-    	this.lvlUp(); 
+    	this.earnExp( this.maxExp() - this.exp );
     	this.HP = this.HT; 
 	}
 	
