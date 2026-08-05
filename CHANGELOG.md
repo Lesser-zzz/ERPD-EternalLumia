@@ -1,3 +1,9 @@
+### 🕒 2026-08-05 19:45:37 KST (Branch: `main (Direct Push)`)
+- **Update appVersionName to '0.0.3'** (c94165b25)
+  
+
+---
+
 ### 🕒 2026-08-05 19:37:35 KST (Branch: `main (Direct Push)`)
 - **시간 제대로 못 맞추는거 고침** (78577ca2a)
   
