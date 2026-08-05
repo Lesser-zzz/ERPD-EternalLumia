@@ -1,3 +1,10 @@
+### 🕒 2026-08-05 10:13:17 KST
+Merge pull request #29 from Lesser-zzz/sprite
+
+스프라이트 바꾼 거 옮김
+
+---
+
 ### 🕒 2026-08-05 07:51:45 KST
 Merge pull request #28 from Lesser-zzz/develop
 
