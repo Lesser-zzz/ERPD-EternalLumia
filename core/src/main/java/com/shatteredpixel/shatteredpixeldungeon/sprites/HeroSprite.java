@@ -69,31 +69,65 @@ public class HeroSprite extends CharSprite {
 	}
 	
 	public void updateArmor() {
+		boolean isWarrior = (Dungeon.hero.heroClass == HeroClass.WARRIOR);
+		int fw = isWarrior ? 16 : FRAME_WIDTH;
+		int fh = isWarrior ? 16 : FRAME_HEIGHT;
 
-		TextureFilm film = new TextureFilm( tiers(), Dungeon.hero.tier(), FRAME_WIDTH, FRAME_HEIGHT );
-		
-		idle = new Animation( 1, true );
-		idle.frames( film, 0, 0, 0, 1, 0, 0, 1, 1 );
-		
-		run = new Animation( RUN_FRAMERATE, true );
-		run.frames( film, 2, 3, 4, 5, 6, 7 );
-		
-		die = new Animation( 20, false );
-		die.frames( film, 8, 9, 10, 11, 12, 11 );
-		
-		attack = new Animation( 15, false );
-		attack.frames( film, 13, 14, 15, 0 );
-		
-		zap = attack.clone();
-		
-		operate = new Animation( 8, false );
-		operate.frames( film, 16, 17, 16, 17 );
-		
-		fly = new Animation( 1, true );
-		fly.frames( film, 18 );
+		TextureFilm film;
+		if (isWarrior) {
+			// [현우 전용 로직] 1616 해상도 적용 및 방어구 에러 방지
+			SmartTexture tex = TextureCache.get( Dungeon.hero.heroClass.spritesheet() );
+			TextureFilm warriorTiers = new TextureFilm( tex, tex.width, fh );
+			
+			// 갑옷을 입어도 없는 이미지를 찾다 튕기지 않도록 강제로 0번째 줄(기본 도트) 고정
+			int safeTier = 0; 
+			film = new TextureFilm( warriorTiers, safeTier, fw, fh );
+			
+			// 현재 60x60 이미지는 1장뿐이므로, 튕김 방지를 위해 모든 동작을 0번 프레임으로 고정
+			idle = new Animation( 2, true );
+			idle.frames( film, 0 );
+			
+			run = new Animation( 10, true );
+			run.frames( film, 0 );
+			
+			die = new Animation( 2, false );
+			die.frames( film, 0 ); 
+			
+			attack = new Animation( 15, false );
+			attack.frames( film, 0 );
+			
+			zap = attack.clone();
+			operate = idle.clone();
+			fly = idle.clone();
+			read = idle.clone();
 
-		read = new Animation( 20, false );
-		read.frames( film, 19, 20, 20, 20, 20, 20, 20, 20, 20, 19 );
+		} else {
+			// [기존 영웅 로직] 전사가 아니라면 원본 녹픽던의 애니메이션을 그대로 사용!
+			film = new TextureFilm( tiers(), Dungeon.hero.tier(), FRAME_WIDTH, FRAME_HEIGHT );
+			
+			idle = new Animation( 1, true );
+			idle.frames( film, 0, 0, 0, 1, 0, 0, 1, 1 );
+			
+			run = new Animation( RUN_FRAMERATE, true );
+			run.frames( film, 2, 3, 4, 5, 6, 7 );
+			
+			die = new Animation( 20, false );
+			die.frames( film, 8, 9, 10, 11, 12, 11 );
+			
+			attack = new Animation( 15, false );
+			attack.frames( film, 13, 14, 15, 0 );
+			
+			zap = attack.clone();
+			
+			operate = new Animation( 8, false );
+			operate.frames( film, 16, 17, 16, 17 );
+			
+			fly = new Animation( 1, true );
+			fly.frames( film, 18 );
+
+			read = new Animation( 20, false );
+			read.frames( film, 19, 20, 20, 20, 20, 20, 20, 20, 20, 19 );
+		}
 		
 		if (Dungeon.hero.isAlive())
 			idle();
@@ -183,10 +217,22 @@ public class HeroSprite extends CharSprite {
 	}
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
+		boolean isWarrior = (cl == HeroClass.WARRIOR);
+		int fw = isWarrior ? 16 : FRAME_WIDTH;
+		int fh = isWarrior ? 16 : FRAME_HEIGHT;
 		
-		RectF patch = tiers().get( armorTier );
+		RectF patch;
+		if (isWarrior) {
+			SmartTexture tex = TextureCache.get( cl.spritesheet() );
+			// 아바타 역시 갑옷을 입고 튕기는 것을 막기 위해 0으로 고정
+			patch = new TextureFilm( tex, tex.width, fh ).get( 0 );
+		} else {
+			patch = tiers().get( armorTier );
+		}
+		
 		Image avatar = new Image( cl.spritesheet() );
-		RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
+		// 현우는 60x60 꽉 찬 도트이므로 불필요한 1px 여백 띄우기(offset)를 0으로 없앰
+		RectF frame = avatar.texture.uvRect( isWarrior ? 0 : 1, 0, fw, fh );
 		frame.shift( patch.left, patch.top );
 		avatar.frame( frame );
 		
