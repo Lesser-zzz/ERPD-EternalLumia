@@ -840,9 +840,11 @@ public class GameScene extends PixelScene {
 	public synchronized void update() {
 		lastOffset = null;
 
-		// 게임 플레이 중 키보드 'L'을 누르면 즉시 레벨업 함수 발동!
-		if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
-    		Dungeon.hero.debugLevelUp();
+		// [Debug 빌드 전용] Actions에서 'debug'로 빌드하여 Game.version에 "INDEV"가 들어간 경우에만 L키 치트 작동
+		if (Game.version != null && Game.version.contains("INDEV")) {
+			if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+				Dungeon.hero.debugLevelUp();
+			}
 		}
 
 		if (updateItemDisplays){
