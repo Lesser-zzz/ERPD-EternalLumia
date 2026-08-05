@@ -87,6 +87,12 @@ public class Dogfight extends Buff {
      */
     private void addStack() {
 
+		// [🌟핵심 추가 부분🌟] 스택을 올리거나 검사하기 직전에 무조건 실시간 갱신!
+        // 이 버프가 달려있는 대상(target)이 영웅(Hero)이라면, 특성을 확인해서 요구치를 다시 계산합니다.
+        if (this.target instanceof Hero) {
+            this.updateRequirementFromTalent((Hero) this.target);
+        }
+
         if (activatedThisAttack) {
             activatedThisAttack = false;
             return;
