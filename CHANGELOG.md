@@ -1,3 +1,9 @@
+### 🕒 2026-08-05 10:35:03 KST (Branch: `main (Direct Push)`)
+- **앱패키지 서명 릴리즈 apk 빌드 시 찍도록 설정** (955da7ce4)
+  이거면 패키징 오류 사라질...덧?
+
+---
+
 ### 🕒 2026-08-05 10:17:57 KST (Branch: `main (Direct Push)`)
 - **Update build_CICD.yml** (0e6b12e59)
   
