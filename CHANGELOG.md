@@ -1,3 +1,34 @@
+### 🕒 2026-08-05 20:53:20 KST
+사인 넣으려고 지랄중
+
+- name: Sign Android Release APK (Native)
+      if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all') && inputs.build_type == 'release'
+      shell: bash
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
+        
+        # 툴을 직접 찾아서 경로 지정 (버전 오탐지 원천 차단)
+        APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name "apksigner.bat" -o -name "apksigner" | head -n 1)
+        ZIPALIGN=$(find "$ANDROID_HOME/build-tools" -name "zipalign.exe" -o -name "zipalign" | head -n 1)
+        
+        echo "Found apksigner: $APKSIGNER"
+        echo "Found zipalign: $ZIPALIGN"
+        
+        APK_PATH=$(find android/build/outputs/apk/release -name "*.apk" | head -n 1)
+        echo "Found APK: $APK_PATH"
+        
+        "$ZIPALIGN" -v -p 4 "$APK_PATH" aligned.apk
+        "$APKSIGNER" sign --ks keystore.jks \
+          --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
+          --ks-pass "pass:${{ secrets.STORE_PASSWORD }}" \
+          --key-pass "pass:${{ secrets.KEY_PASSWORD }}" \
+          aligned.apk
+          
+        mv aligned.apk "$APK_PATH"
+        echo "Successfully signed Android Release APK!"
+
+---
+
 ### 🕒 2026-08-05 20:46:33 KST
 SDK에 미리 깔아야하는데 빼묵었대
 
