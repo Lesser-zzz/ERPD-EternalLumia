@@ -40,7 +40,18 @@ jobs:
       with:
         fetch-depth: 2 # 커밋 메시지를 정확히 읽어오기 위해 설정
 
-    # --- [체인지로그 자동화 스텝 추가] ---
+    # =====================================================================
+    # 🌟 [추가된 핵심 로직] 🌟 
+    # workflow_dispatch에서 'debug'를 선택했을 때만 build.gradle의 버전에 -INDEV를 몰래 붙임
+    # =====================================================================
+    - name: Debug 모드일 때만 INDEV 태그 자동 부착 (치트 활성화)
+      if: github.event_name == 'workflow_dispatch' && inputs.build_type == 'debug'
+      shell: bash
+      run: |
+        sed -i "s/appVersionName = '\([^']*\)'/appVersionName = '\1-INDEV'/" build.gradle
+    # =====================================================================
+
+    # --- [체인지로그 자동화 스텝] ---
     - name: Update Changelog Automatically
       if: github.event_name == 'push'
       shell: bash
