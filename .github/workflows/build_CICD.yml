@@ -144,8 +144,6 @@ jobs:
         keyPassword: ${{ secrets.KEY_PASSWORD }}
         # (말 안 듣던 buildToolsVersion: 34.0.0 은 쿨하게 지워버렸습니다!)
         
-    - name: Upload Desktop Artifact
-      # ... (이하 동일) ...
 
     - name: Upload Desktop Artifact
       uses: actions/upload-artifact@v4
