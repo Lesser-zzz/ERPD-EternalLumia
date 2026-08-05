@@ -58,7 +58,7 @@ jobs:
       shell: bash
       run: |
         # 1. 한국 시간(KST) 설정
-        CURRENT_TIME=$(TZ='Asia/Seoul' date +'%Y-%m-%d %H:%M:%S KST')
+        CURRENT_TIME=$(TZ='KST-9' date +'%Y-%m-%d %H:%M:%S KST')
         
         # 2. 방금 Push(또는 Merge)로 인해 main에 추가된 '모든' 커밋 메시지 가져오기 (제목 + 본문 모두 포함)
         COMMIT_MSGS=$(git log ${{ github.event.before }}..${{ github.event.after }} --pretty=format:"- **%s** (%h)%n  %b")
