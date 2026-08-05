@@ -87,6 +87,12 @@ public class Dogfight extends Buff {
      */
     private void addStack() {
 
+		// [🌟핵심 추가 부분🌟] 스택을 올리거나 검사하기 직전에 무조건 실시간 갱신!
+        // 이 버프가 달려있는 대상(target)이 영웅(Hero)이라면, 특성을 확인해서 요구치를 다시 계산합니다.
+        if (this.target instanceof Hero) {
+            this.updateRequirementFromTalent((Hero) this.target);
+        }
+
         if (activatedThisAttack) {
             activatedThisAttack = false;
             return;
@@ -279,8 +285,8 @@ public class Dogfight extends Buff {
 		// 영웅이 찍은 T2 도그파이트 특성 포인트 (0, 1, 2)
 		int talentPoints = hero.pointsInTalent(com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent.DOGFIGHT);
 		
-		// 특성 1레벨당 2씩 감소 (최대 4 감소하여 6회에 발동 등 원하는 밸런스 설정)
-		int reduction = talentPoints * 2;
+		// 특성 1레벨당 1씩 감소 (최대 2 감소하여 8회에 발동 등 원하는 밸런스 설정)
+		int reduction = talentPoints * 1;
 		
 		requiredHits = Math.max(4, baseRequirement - reduction);
 		

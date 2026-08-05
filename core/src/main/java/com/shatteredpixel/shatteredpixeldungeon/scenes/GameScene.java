@@ -148,6 +148,8 @@ import com.watabou.utils.Point;
 import com.watabou.utils.PointF;
 import com.watabou.utils.Random;
 import com.watabou.utils.RectF;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -837,6 +839,13 @@ public class GameScene extends PixelScene {
 	@Override
 	public synchronized void update() {
 		lastOffset = null;
+
+		// [Debug 빌드 전용] Actions에서 'debug'로 빌드하여 Game.version에 "INDEV"가 들어간 경우에만 L키 치트 작동
+		if (Game.version != null && Game.version.contains("INDEV")) {
+			if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+				Dungeon.hero.debugLevelUp();
+			}
+		}
 
 		if (updateItemDisplays){
 			updateItemDisplays = false;

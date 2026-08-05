@@ -1979,6 +1979,16 @@ public class Hero extends Char {
 
 		return true;
 	}
+
+	// 사지방 테스트용 즉시 레벨업 치트 함수
+	public void debugLevelUp() {
+		// 1. 다음 레벨까지 필요한 경험치를 '나 자신(Hero.class)'을 출처로 획득합니다.
+		// (이 함수 하나만 부르면 엔진 내부에서 알아서 특성 포인트 지급, 스탯 증가 등을 전부 완벽하게 처리해 줍니다!)
+		this.earnExp( this.maxExp() - this.exp, Hero.class );
+		
+		// 2. 덤으로 체력 꽉 채워주기
+		this.HP = this.HT; 
+	}
 	
 	public void earnExp( int exp, Class source ) {
 
