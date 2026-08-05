@@ -83,18 +83,21 @@ public class HeroSprite extends CharSprite {
 			int safeTier = 0; 
 			film = new TextureFilm( warriorTiers, safeTier, fw, fh );
 			
-			// 현재 60x60 이미지는 1장뿐이므로, 튕김 방지를 위해 모든 동작을 0번 프레임으로 고정
+			// 0번 프레임: 대기 (가만히 서 있음)
 			idle = new Animation( 2, true );
 			idle.frames( film, 0 );
 			
+			// 0번과 1번 프레임 번갈아 재생: 이동 (다리를 움직이며 뜀)
 			run = new Animation( 10, true );
-			run.frames( film, 0 );
+			run.frames( film, 0, 1 );
 			
+			// 3번 프레임: 사망 (비석으로 변함)
 			die = new Animation( 2, false );
-			die.frames( film, 0 ); 
+			die.frames( film, 3 ); 
 			
+			// 2번 프레임 후 0번 프레임: 공격 (주먹을 뻗었다가 다시 기본 자세로)
 			attack = new Animation( 15, false );
-			attack.frames( film, 0 );
+			attack.frames( film, 2, 0 );
 			
 			zap = attack.clone();
 			operate = idle.clone();
@@ -224,14 +227,15 @@ public class HeroSprite extends CharSprite {
 		RectF patch;
 		if (isWarrior) {
 			SmartTexture tex = TextureCache.get( cl.spritesheet() );
-			// 아바타 역시 갑옷을 입고 튕기는 것을 막기 위해 0으로 고정
-			patch = new TextureFilm( tex, tex.width, fh ).get( 0 );
+			// 64x16 시트에서 가로 16(fw) x 세로 16(fh) 크기로 프레임을 나누고, 
+			// 그 중 0번째 프레임(대기 모션)을 얼굴 아바타로 사용
+			patch = new TextureFilm( tex, fw, fh ).get( 0 );
 		} else {
 			patch = tiers().get( armorTier );
 		}
 		
 		Image avatar = new Image( cl.spritesheet() );
-		// 현우는 60x60 꽉 찬 도트이므로 불필요한 1px 여백 띄우기(offset)를 0으로 없앰
+		// 원본 녹픽던은 1px 여백이 있지만, 현우는 16x16 정사이즈이므로 0부터 시작
 		RectF frame = avatar.texture.uvRect( isWarrior ? 0 : 1, 0, fw, fh );
 		frame.shift( patch.left, patch.top );
 		avatar.frame( frame );
