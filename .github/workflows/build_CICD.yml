@@ -38,7 +38,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 2 # 커밋 메시지를 정확히 읽어오기 위해 설정
+        fetch-depth: 0 # 👈 [수정됨] PR에 포함된 모든 커밋 메시지를 정확히 읽어오기 위해 0으로 변경
 
     # =====================================================================
     # 🌟 [추가된 핵심 로직] 🌟 
@@ -52,27 +52,43 @@ jobs:
     # =====================================================================
 
     # --- [체인지로그 자동화 스텝] ---
+    # 👈 [수정됨] 브랜치명 추출 및 여러 커밋(제목+본문) 동시 반영 로직 적용
     - name: Update Changelog Automatically
       if: github.event_name == 'push'
       shell: bash
       run: |
-        # 한국 시간(KST) 및 방금 푸시된 커밋 메시지 추출
+        # 1. 한국 시간(KST) 설정
         CURRENT_TIME=$(TZ='Asia/Seoul' date +'%Y-%m-%d %H:%M:%S KST')
-        COMMIT_MSG=$(git log -1 --pretty=format:"%B")
         
-        # 파일이 없으면 생성
+        # 2. 방금 Push(또는 Merge)로 인해 main에 추가된 '모든' 커밋 메시지 가져오기 (제목 + 본문 모두 포함)
+        COMMIT_MSGS=$(git log ${{ github.event.before }}..${{ github.event.after }} --pretty=format:"- **%s** (%h)%n  %b")
+        
+        # 3. 브랜치 이름 추출하기
+        LAST_COMMIT=$(git log -1 --pretty=format:"%s")
+        BRANCH_NAME="main (Direct Push)"
+        
+        # 깃허브의 기본 병합 메시지에서 정규식으로 브랜치명만 추출
+        if [[ "$LAST_COMMIT" =~ from\ [^/]+/([^ ]+) ]]; then
+          BRANCH_NAME="${BASH_REMATCH[1]}"
+        elif [[ "$LAST_COMMIT" =~ Merge\ branch\ \'([^\']+)\' ]]; then
+          BRANCH_NAME="${BASH_REMATCH[1]}"
+        fi
+        
+        # 4. 파일이 없으면 생성
         if [ ! -f CHANGELOG.md ]; then touch CHANGELOG.md; fi
         
-        # 임시 파일에 새 로그를 쓰고 기존 로그를 아래에 덧붙임
-        echo "### 🕒 $CURRENT_TIME" > temp_changelog.md
-        echo "$COMMIT_MSG" >> temp_changelog.md
+        # 5. 임시 파일에 새 로그 작성 (브랜치명 포함!)
+        echo "### 🕒 $CURRENT_TIME (Branch: \`$BRANCH_NAME\`)" > temp_changelog.md
+        echo "$COMMIT_MSGS" >> temp_changelog.md
         echo "" >> temp_changelog.md
         echo "---" >> temp_changelog.md
         echo "" >> temp_changelog.md
+        
+        # 기존 로그를 아래에 덧붙이고 덮어쓰기
         cat CHANGELOG.md >> temp_changelog.md
         mv temp_changelog.md CHANGELOG.md
         
-        # 봇 계정으로 변경사항 자동 커밋 및 푸시 (무한루프 방지를 위해 [skip ci] 태그 추가)
+        # 6. 봇 계정으로 변경사항 자동 커밋 및 푸시 (무한루프 방지를 위해 [skip ci] 태그 추가)
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add CHANGELOG.md
