@@ -15,7 +15,7 @@ allprojects {
         appPackageName = 'erpd.eternallumia'
 
         appVersionCode = 896
-        appVersionName = '0.0.1'
+        appVersionName = '0.0.3'
 
         appJavaCompatibility = JavaVersion.VERSION_11
 
