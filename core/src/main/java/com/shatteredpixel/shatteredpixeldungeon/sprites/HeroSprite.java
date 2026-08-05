@@ -224,20 +224,19 @@ public class HeroSprite extends CharSprite {
 		int fw = isWarrior ? 16 : FRAME_WIDTH;
 		int fh = isWarrior ? 16 : FRAME_HEIGHT;
 		
-		RectF patch;
+		Image avatar = new Image( cl.spritesheet() );
+		RectF frame;
+		
 		if (isWarrior) {
-			SmartTexture tex = TextureCache.get( cl.spritesheet() );
-			// 64x16 시트에서 가로 16(fw) x 세로 16(fh) 크기로 프레임을 나누고, 
-			// 그 중 0번째 프레임(대기 모션)을 얼굴 아바타로 사용
-			patch = new TextureFilm( tex, fw, fh ).get( 0 );
+			// 현우(전사)는 16x16 정사이즈 시트의 0번째 프레임(대기 모션)을 아바타로 깔끔하게 지정
+			frame = avatar.texture.uvRect( 0, 0, 16, 16 );
 		} else {
-			patch = tiers().get( armorTier );
+			// 기존 영웅 로직 유지
+			RectF patch = tiers().get( armorTier );
+			frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
+			frame.shift( patch.left, patch.top );
 		}
 		
-		Image avatar = new Image( cl.spritesheet() );
-		// 원본 녹픽던은 1px 여백이 있지만, 현우는 16x16 정사이즈이므로 0부터 시작
-		RectF frame = avatar.texture.uvRect( isWarrior ? 0 : 1, 0, fw, fh );
-		frame.shift( patch.left, patch.top );
 		avatar.frame( frame );
 		
 		return avatar;
