@@ -58,11 +58,15 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.journal.Guidebook;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfHaste;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfMight;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.InventoryScroll;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.DimensionalSundial;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.TrinketCatalyst;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Sword;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Bestiary;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Document;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Journal;
@@ -840,12 +844,44 @@ public class GameScene extends PixelScene {
 	public synchronized void update() {
 		lastOffset = null;
 
-		// [Debug 빌드 전용] Actions에서 'debug'로 빌드하여 Game.version에 "INDEV"가 들어간 경우에만 L키 치트 작동
+		// =========================================================
+		// [🌟 Debug 빌드 전용 치트 공간 🌟]
+		// Actions에서 'debug'로 빌드하여 Game.version에 "INDEV"가 들어간 경우에만 작동!
 		if (Game.version != null && Game.version.contains("INDEV")) {
+			
+			// 1. 키보드 'L'을 누르면 즉시 레벨업
 			if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
 				Dungeon.hero.debugLevelUp();
 			}
+
+			// 2. 키보드 'K'를 누르면 개발자용 사기 스타터팩 지급
+			if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
+				
+				// ① 마법 지도의 주문서 99장 지급
+				ScrollOfMagicMapping scroll = new ScrollOfMagicMapping();
+				scroll.quantity(99); 
+				scroll.collect(Dungeon.hero.belongings.backpack);
+
+				// ② 완력의 반지 +100 강 지급 (핵펀치)
+				RingOfMight might = new RingOfMight();
+				for (int i = 0; i < 100; i++) might.upgrade();
+				might.collect(Dungeon.hero.belongings.backpack);
+
+				// ③ 신속의 반지 +100 강 지급 (초음속)
+				RingOfHaste haste = new RingOfHaste();
+				for (int i = 0; i < 100; i++) haste.upgrade();
+				haste.collect(Dungeon.hero.belongings.backpack);
+
+				// ④ 사기 무기 (검 +999강) 지급
+				Sword devWeapon = new Sword();
+				for (int i = 0; i < 999; i++) devWeapon.upgrade();
+				devWeapon.collect(Dungeon.hero.belongings.backpack);
+
+				// ⑤ 획득 완료 알림창
+				GLog.i("개발자용 무한 스타터팩 지급 완료!");
+			}
 		}
+		// =========================================================
 
 		if (updateItemDisplays){
 			updateItemDisplays = false;
