@@ -70,12 +70,12 @@ public class HeroSprite extends CharSprite {
 	
 	public void updateArmor() {
 		boolean isWarrior = (Dungeon.hero.heroClass == HeroClass.WARRIOR);
-		int fw = isWarrior ? 60 : FRAME_WIDTH;
-		int fh = isWarrior ? 60 : FRAME_HEIGHT;
+		int fw = isWarrior ? 16 : FRAME_WIDTH;
+		int fh = isWarrior ? 16 : FRAME_HEIGHT;
 
 		TextureFilm film;
 		if (isWarrior) {
-			// [현우 전용 로직] 60x60 해상도 적용 및 방어구 에러 방지
+			// [현우 전용 로직] 1616 해상도 적용 및 방어구 에러 방지
 			SmartTexture tex = TextureCache.get( Dungeon.hero.heroClass.spritesheet() );
 			TextureFilm warriorTiers = new TextureFilm( tex, tex.width, fh );
 			
@@ -218,8 +218,8 @@ public class HeroSprite extends CharSprite {
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
 		boolean isWarrior = (cl == HeroClass.WARRIOR);
-		int fw = isWarrior ? 60 : FRAME_WIDTH;
-		int fh = isWarrior ? 60 : FRAME_HEIGHT;
+		int fw = isWarrior ? 16 : FRAME_WIDTH;
+		int fh = isWarrior ? 16 : FRAME_HEIGHT;
 		
 		RectF patch;
 		if (isWarrior) {
