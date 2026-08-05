@@ -71,6 +71,12 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    # =====================================================================
+    # 🌟 [핵심 추가] 안드로이드 SDK 및 빌드 툴을 러너에 안전하게 세팅하는 공식 액션
+    # =====================================================================
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Compile check (Fast)
       run: .\gradlew.bat compileJava
 
@@ -87,7 +93,7 @@ jobs:
       run: .\gradlew.bat android:assembleRelease
 
     # =====================================================================
-    # 🌟 [완벽한 정석 서명 스텝] 빌드 직후 러너 표준 툴로 안전하게 서명 수행
+    # 🌟 [안전한 서명 스텝] $ANDROID_HOME을 정확히 참조하여 서명 수행
     # =====================================================================
     - name: Sign Android Release APK (Native)
       if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'android' || inputs.build_target == 'all') && inputs.build_type == 'release'
@@ -95,7 +101,8 @@ jobs:
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
         
-        BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+        # $ANDROID_HOME 변수를 이용해 안전하게 경로 탐색
+        BUILD_TOOLS_DIR=$(ls -d "$ANDROID_HOME/build-tools/"* | sort -V | tail -n 1)
         ZIPALIGN="$BUILD_TOOLS_DIR/zipalign"
         APKSIGNER="$BUILD_TOOLS_DIR/apksigner"
         
@@ -104,8 +111,8 @@ jobs:
         APK_PATH=$(find android/build/outputs/apk/release -name "*.apk" | head -n 1)
         echo "Found APK: $APK_PATH"
         
-        $ZIPALIGN -v -p 4 "$APK_PATH" aligned.apk
-        $APKSIGNER sign --ks keystore.jks \
+        "$ZIPALIGN" -v -p 4 "$APK_PATH" aligned.apk
+        "$APKSIGNER" sign --ks keystore.jks \
           --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
           --ks-pass "pass:${{ secrets.STORE_PASSWORD }}" \
           --key-pass "pass:${{ secrets.KEY_PASSWORD }}" \
