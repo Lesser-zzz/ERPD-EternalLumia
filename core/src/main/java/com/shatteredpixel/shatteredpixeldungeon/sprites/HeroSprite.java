@@ -221,15 +221,22 @@ public class HeroSprite extends CharSprite {
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
 		boolean isWarrior = (cl == HeroClass.WARRIOR);
-		int fw = isWarrior ? 16 : FRAME_WIDTH;
-		int fh = isWarrior ? 16 : FRAME_HEIGHT;
 		
 		Image avatar = new Image( cl.spritesheet() );
 		RectF frame;
 		
 		if (isWarrior) {
-			// 현우(전사)는 16x16 정사이즈 시트의 0번째 프레임(대기 모션)을 아바타로 깔끔하게 지정
-			frame = avatar.texture.uvRect( 0, 0, 16, 16 );
+			// 16x16 픽셀을 이미지의 전체 너비/높이(tex.width, tex.height)로 나누어 UV 좌표 계산
+			int fw = 16;
+			int fh = 16;
+			SmartTexture tex = avatar.texture;
+			
+			float x1 = 0f;
+			float y1 = 0f;
+			float x2 = (float) fw / tex.width;
+			float y2 = (float) fh / tex.height;
+			
+			frame = new RectF( x1, y1, x2, y2 );
 		} else {
 			// 기존 영웅 로직 유지
 			RectF patch = tiers().get( armorTier );
