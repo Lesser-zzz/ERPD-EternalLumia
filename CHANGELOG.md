@@ -1,3 +1,10 @@
+### 🕒 2026-08-05 23:03:42 KST
+Merge pull request #30 from Lesser-zzz/develop-cheat
+
+맵핵지도 개쎈반지 개빠른반지 개센검 추가
+
+---
+
 ### 🕒 2026-08-05 22:14:47 KST
 Update DEVLOG.md
 
