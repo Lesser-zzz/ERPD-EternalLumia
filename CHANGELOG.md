@@ -1,3 +1,10 @@
+### 🕒 2026-08-05 07:51:45 KST
+Merge pull request #28 from Lesser-zzz/develop
+
+L키 레벨업 치트 / 도그파이트 특성연결 안되던거 수정 / 
+
+---
+
 ### 🕒 2026-08-05 07:16:23 KST
 debug버전에서만 치트 적용되도록 바꿔봄
 
