@@ -218,23 +218,24 @@ public class HeroSprite extends CharSprite {
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
 		boolean isWarrior = (cl == HeroClass.WARRIOR);
-		int fw = isWarrior ? 16 : FRAME_WIDTH;
-		int fh = isWarrior ? 16 : FRAME_HEIGHT;
-		
-		RectF patch;
-		if (isWarrior) {
-			SmartTexture tex = TextureCache.get( cl.spritesheet() );
-			// 아바타 역시 갑옷을 입고 튕기는 것을 막기 위해 0으로 고정
-			patch = new TextureFilm( tex, tex.width, fh ).get( 0 );
-		} else {
-			patch = tiers().get( armorTier );
-		}
 		
 		Image avatar = new Image( cl.spritesheet() );
-		// 현우는 60x60 꽉 찬 도트이므로 불필요한 1px 여백 띄우기(offset)를 0으로 없앰
-		RectF frame = avatar.texture.uvRect( isWarrior ? 0 : 1, 0, fw, fh );
-		frame.shift( patch.left, patch.top );
-		avatar.frame( frame );
+		
+		if (isWarrior) {
+			// [현우 전용 로직] 
+			// 수동 좌표 계산 시 발생하는 1픽셀 늘어짐(긴 줄 현상)을 원천 차단하기 위해
+			// 엔진의 TextureFilm 객체를 사용하여 시트를 16x16 규격으로 안전하게 쪼갭니다.
+			TextureFilm film = new TextureFilm( avatar.texture, 16, 16 );
+			
+			// 0번째 프레임(첫 번째 대기 모션)의 영역만 정확하게 가져와서 UI 프레임으로 씌웁니다.
+			avatar.frame( film.get( 0 ) );
+		} else {
+			// [기존 영웅 로직 유지]
+			RectF patch = tiers().get( armorTier );
+			RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
+			frame.shift( patch.left, patch.top );
+			avatar.frame( frame );
+		}
 		
 		return avatar;
 	}
