@@ -220,26 +220,23 @@ public class HeroSprite extends CharSprite {
 	}
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
-		boolean isWarrior = (cl == HeroClass.WARRIOR);
-		
-		Image avatar = new Image( cl.spritesheet() );
-		
-		if (isWarrior) {
-			// [현우 전용 로직] 
-			// 수동 좌표 계산 시 발생하는 1픽셀 늘어짐(긴 줄 현상)을 원천 차단하기 위해
-			// 엔진의 TextureFilm 객체를 사용하여 시트를 16x16 규격으로 안전하게 쪼갭니다.
-			TextureFilm film = new TextureFilm( avatar.texture, 16, 16 );
-			
-			// 0번째 프레임(첫 번째 대기 모션)의 영역만 정확하게 가져와서 UI 프레임으로 씌웁니다.
-			avatar.frame( film.get( 0 ) );
-		} else {
-			// [기존 영웅 로직 유지]
-			RectF patch = tiers().get( armorTier );
-			RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
-			frame.shift( patch.left, patch.top );
-			avatar.frame( frame );
-		}
-		
-		return avatar;
+    	boolean isWarrior = (cl == HeroClass.WARRIOR);
+    
+    	Image avatar = new Image( cl.spritesheet() );
+    
+    	if (isWarrior) {
+        	// [현우 전용 로직] 
+        	// TextureFilm 버그를 피하고 16x16 영역을 uvRect로 직접 안전하게 자릅니다.
+        	RectF frame = avatar.texture.uvRect( 0, 0, 16, 16 );
+        	avatar.frame( frame );
+    	} else {
+        	// [기존 영웅 로직 유지]
+        	RectF patch = tiers().get( armorTier );
+        	RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
+        	frame.shift( patch.left, patch.top );
+        	avatar.frame( frame );
+    	}
+    
+    	return avatar;
 	}
 }
