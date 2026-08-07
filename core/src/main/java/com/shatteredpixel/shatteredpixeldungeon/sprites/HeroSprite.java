@@ -230,20 +230,21 @@ public class HeroSprite extends CharSprite {
 	}
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
-	    Image avatar = new Image( cl.spritesheet() );
-	    
-	    if (cl == HeroClass.WARRIOR) {
-	        // [현우 전용] 전체 영역(64x16) 중 딱 1/4 (첫 얼굴 프레임)만 오려냄
-	        RectF frame = new RectF( avatar.frame() );
-	        frame.right = frame.left + (frame.width() / 4f); 
-	        avatar.frame( frame );
-	    } else {
-	        // [원본 유지]
-	        RectF patch = tiers().get( armorTier );
-	        RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
-	        frame.shift( patch.left, patch.top );
-	        avatar.frame( frame );
-	    }
-	    return avatar;
+		Image avatar = new Image( cl.spritesheet() );
+		
+		if (cl == HeroClass.WARRIOR) {
+			// [현우 전용] 전체 영역(64x16) 중 딱 1/4 (첫 얼굴 프레임)만 오려냄
+			RectF frame = new RectF( avatar.frame() );
+			frame.right = frame.left + (frame.width() / 4f); 
+			avatar.frame( frame );
+		} else {
+			// [원본 유지]
+			RectF patch = tiers().get( armorTier );
+			RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
+			frame.shift( patch.left, patch.top );
+			avatar.frame( frame );
+		}
+		
+		return avatar;
 	}
 }
