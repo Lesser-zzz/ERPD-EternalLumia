@@ -230,23 +230,14 @@ public class HeroSprite extends CharSprite {
 	}
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
-    	boolean isWarrior = (cl == HeroClass.WARRIOR);
-    
-    	Image avatar = new Image( cl.spritesheet() );
-    
-    	if (isWarrior) {
-        	// [현우 전용 로직] 
-        	// TextureFilm 버그를 피하고 16x16 영역을 uvRect로 직접 안전하게 자릅니다.
-        	RectF frame = avatar.texture.uvRect( 0, 0, 16, 16 );
-        	avatar.frame( frame );
-    	} else {
-        	// [기존 영웅 로직 유지]
-        	RectF patch = tiers().get( armorTier );
-        	RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
-        	frame.shift( patch.left, patch.top );
-        	avatar.frame( frame );
-    	}
-    
-    	return avatar;
+		
+		RectF patch = tiers().get( armorTier );
+		Image avatar = new Image( cl.spritesheet() );
+		RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
+		frame.shift( patch.left, patch.top );
+		avatar.frame( frame );
+		
+		return avatar;
 	}
+
 }
