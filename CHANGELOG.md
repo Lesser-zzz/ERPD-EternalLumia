@@ -1,3 +1,10 @@
+### 🕒 2026-08-07 23:16:21 KST
+Merge pull request #31 from Lesser-zzz/sprite
+
+Sprite
+
+---
+
 ### 🕒 2026-08-07 22:07:01 KST
 Update DEVLOG.md
 
