@@ -230,14 +230,30 @@ public class HeroSprite extends CharSprite {
 	}
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
-		
-		RectF patch = tiers().get( armorTier );
-		Image avatar = new Image( cl.spritesheet() );
-		RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
-		frame.shift( patch.left, patch.top );
-		avatar.frame( frame );
-		
-		return avatar;
+    	boolean isWarrior = (cl == HeroClass.WARRIOR);
+
+    	// 1. 거대한 아틀라스에서 현우 영역을 찾아 이미지를 로드합니다.
+    	Image avatar = new Image( cl.spritesheet() );
+
+    	if (isWarrior) {
+        	// [현우 전용 무적 로직]
+        	// 2. 현우가 있는 UV 좌표 영역(64x16 비율)을 통째로 복사합니다.
+        	RectF frame = new RectF( avatar.frame() );
+
+        	// 3. 전체 가로 길이(4칸) 중, 딱 1/4 (첫 번째 대기/얼굴 프레임)만 계산해서 잘라냅니다.
+        	frame.right = frame.left + (frame.width() / 4f);
+
+        	// 4. 자른 영역을 초상화로 확정합니다. 아틀라스 좌표와 무관하게 절대 깨지지 않습니다.
+        	avatar.frame( frame );
+    	} else {
+        	// [순정 기존 영웅 로직 유지]
+        	RectF patch = tiers().get( armorTier );
+        	RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
+        	frame.shift( patch.left, patch.top );
+        	avatar.frame( frame );
+    	}
+
+    	return avatar;
 	}
 
 }
