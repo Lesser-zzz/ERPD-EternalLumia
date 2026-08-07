@@ -50,15 +50,26 @@ jobs:
       shell: bash
       run: |
         CURRENT_TIME=$(TZ='KST-9' date +'%Y-%m-%d %H:%M:%S KST')
-        COMMIT_MSG=$(git log -1 --pretty=format:"%B")
+        
+        # -1(최근 1개)을 지우고 before와 sha를 이용해 병합된 '모든' 커밋 + 병합 커밋(Merge)까지 전부 가져옵니다.
+        COMMIT_MSG=$(git log ${{ github.event.before }}..${{ github.sha }} --pretty=format:"- %s (%h)%n%b")
+        
+        if [ -z "$COMMIT_MSG" ]; then
+          echo "No valid commits to add to changelog."
+          exit 0
+        fi
+
         if [ ! -f CHANGELOG.md ]; then touch CHANGELOG.md; fi
+        
         echo "### 🕒 $CURRENT_TIME" > temp_changelog.md
         echo "$COMMIT_MSG" >> temp_changelog.md
         echo "" >> temp_changelog.md
         echo "---" >> temp_changelog.md
         echo "" >> temp_changelog.md
+        
         cat CHANGELOG.md >> temp_changelog.md
         mv temp_changelog.md CHANGELOG.md
+        
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add CHANGELOG.md
