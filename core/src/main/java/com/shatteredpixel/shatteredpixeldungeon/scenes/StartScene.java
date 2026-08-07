@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
@@ -220,8 +221,22 @@ public class StartScene extends PixelScene {
 					name.text(Messages.titleCase(info.heroClass.title()));
 				}
 				
+				// --- [수정된 아바타 렌더링 로직 시작] ---
+				Image tempHero = new Image(info.heroClass.spritesheet());
+				
+				if (info.heroClass == HeroClass.WARRIOR) {
+					// 현우 64x16 비율 절삭 (전체 가로 길이의 1/4)
+					RectF frame = new RectF(tempHero.frame());
+					frame.right = frame.left + (frame.width() / 4f);
+					tempHero.frame(frame);
+				} else {
+					// 기존 영웅 12x15 하드코딩 절삭 유지
+					RectF frame = tempHero.texture.uvRect(0, 15 * info.armorTier, 12, 15);
+					tempHero.frame(frame);
+				}
+
 				if (hero == null){
-					hero = new Image(info.heroClass.spritesheet(), 0, 15*info.armorTier, 12, 15);
+					hero = tempHero;
 					add(hero);
 					
 					steps = new Image(Icons.get(Icons.STAIRS));
@@ -234,10 +249,11 @@ public class StartScene extends PixelScene {
 					level = new BitmapText(PixelScene.pixelFont);
 					add(level);
 				} else {
-					hero.copy(new Image(info.heroClass.spritesheet(), 0, 15*info.armorTier, 12, 15));
+					hero.copy(tempHero);
 					
 					classIcon.copy(Icons.get(info.heroClass));
 				}
+				// --- [수정된 아바타 렌더링 로직 끝] ---
 
 				long diff = Game.realTime - info.lastPlayed;
 				if (diff > 99L * 30 * 24 * 60 * 60_000){

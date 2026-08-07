@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.HeroDisguise;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass; // 💡 이 줄을 추가!
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.watabou.gltextures.SmartTexture;
 import com.watabou.gltextures.TextureCache;
@@ -70,31 +71,43 @@ public class HeroSprite extends CharSprite {
 	
 	public void updateArmor() {
 		boolean isWarrior = (Dungeon.hero.heroClass == HeroClass.WARRIOR);
+
 		int fw = isWarrior ? 16 : FRAME_WIDTH;
 		int fh = isWarrior ? 16 : FRAME_HEIGHT;
 
 		TextureFilm film;
+		
 		if (isWarrior) {
-			// [현우 전용 로직] 1616 해상도 적용 및 방어구 에러 방지
+			// 🥊 [현우 전용 로직: 무기 루트에 따른 도트 변경]
+			boolean isBerserker = (Dungeon.hero.subClass == HeroSubClass.BERSERKER); // 글러브
+			boolean isGladiator = (Dungeon.hero.subClass == HeroSubClass.GLADIATOR); // 톤파
+
+			// 1. 현재 무기 루트(전직)에 따라 스프라이트 시트의 줄(Tier)을 결정합니다.
+			int safeTier = 0; // 🧑 기본 현우 (1~9층, 0번째 줄)
+			if (isBerserker) {
+				safeTier = 0; // 🥊 글러브(광전사) 현우 (10층~, 1번째 줄) - 여기도 0통일 아직 없으니
+			} else if (isGladiator) {
+				safeTier = 0; // 🏏 톤파(검투사) 현우 (10층~, 2번째 줄) - 아직 없으니 0 통일
+			}
+
+			// 2. 결정된 safeTier를 바탕으로 텍스처를 잘라옵니다.
 			SmartTexture tex = TextureCache.get( Dungeon.hero.heroClass.spritesheet() );
 			TextureFilm warriorTiers = new TextureFilm( tex, tex.width, fh );
 			
-			// 갑옷을 입어도 없는 이미지를 찾다 튕기지 않도록 강제로 0번째 줄(기본 도트) 고정
-			int safeTier = 0; 
 			film = new TextureFilm( warriorTiers, safeTier, fw, fh );
 			
-			// 현재 60x60 이미지는 1장뿐이므로, 튕김 방지를 위해 모든 동작을 0번 프레임으로 고정
+			// 3. 애니메이션 프레임 세팅 (현우 계열 공통)
 			idle = new Animation( 2, true );
 			idle.frames( film, 0 );
 			
 			run = new Animation( 10, true );
-			run.frames( film, 0 );
+			run.frames( film, 0, 1 );
 			
 			die = new Animation( 2, false );
-			die.frames( film, 0 ); 
+			die.frames( film, 3 ); 
 			
 			attack = new Animation( 15, false );
-			attack.frames( film, 0 );
+			attack.frames( film, 2, 0 );
 			
 			zap = attack.clone();
 			operate = idle.clone();
@@ -102,7 +115,7 @@ public class HeroSprite extends CharSprite {
 			read = idle.clone();
 
 		} else {
-			// [기존 영웅 로직] 전사가 아니라면 원본 녹픽던의 애니메이션을 그대로 사용!
+			// 🧙 [기존 영웅 로직] 전사가 아니라면 원본 녹픽던의 애니메이션을 그대로 사용!
 			film = new TextureFilm( tiers(), Dungeon.hero.tier(), FRAME_WIDTH, FRAME_HEIGHT );
 			
 			idle = new Animation( 1, true );
@@ -217,33 +230,20 @@ public class HeroSprite extends CharSprite {
 	}
 	
 	public static Image avatar( HeroClass cl, int armorTier ) {
-		boolean isWarrior = (cl == HeroClass.WARRIOR);
-		int fw = isWarrior ? 16 : FRAME_WIDTH;
-		int fh = isWarrior ? 16 : FRAME_HEIGHT;
-
-		RectF patch;
-
-		if (isWarrior) {
-			SmartTexture tex = TextureCache.get( cl.spritesheet() );
-			// 아바타 역시 갑옷을 입고 튕기는 것을 막기 위해 0으로 고정
-			patch = new TextureFilm( tex, tex.width, fh ).get( 0 );
-
-
-
-
-		} else {
-			patch = tiers().get( armorTier );
-
-
-
-
-		}
-
 		Image avatar = new Image( cl.spritesheet() );
-		// 현우는 60x60 꽉 찬 도트이므로 불필요한 1px 여백 띄우기(offset)를 0으로 없앰
-		RectF frame = avatar.texture.uvRect( isWarrior ? 0 : 1, 0, fw, fh );
-		frame.shift( patch.left, patch.top );
-		avatar.frame( frame );
+		
+		if (cl == HeroClass.WARRIOR) {
+			// [현우 전용] 전체 영역(64x16) 중 딱 1/4 (첫 얼굴 프레임)만 오려냄
+			RectF frame = new RectF( avatar.frame() );
+			frame.right = frame.left + (frame.width() / 4f); 
+			avatar.frame( frame );
+		} else {
+			// [원본 유지]
+			RectF patch = tiers().get( armorTier );
+			RectF frame = avatar.texture.uvRect( 1, 0, FRAME_WIDTH, FRAME_HEIGHT );
+			frame.shift( patch.left, patch.top );
+			avatar.frame( frame );
+		}
 		
 		return avatar;
 	}
