@@ -564,60 +564,71 @@ public class HeroSelectScene extends PixelScene {
 
 	private class HeroBtn extends StyledButton {
 
-		private HeroClass cl;
+    private HeroClass cl;
 
-		private static final int MIN_WIDTH = 20;
-		private static final int HEIGHT = 24;
+    private static final int MIN_WIDTH = 20;
+    private static final int HEIGHT = 24;
 
-		HeroBtn ( HeroClass cl ){
-			super(Chrome.Type.GREY_BUTTON_TR, "");
+    HeroBtn ( HeroClass cl ){
+        super(Chrome.Type.GREY_BUTTON_TR, "");
 
-			this.cl = cl;
+        this.cl = cl;
 
-			icon(new Image(cl.spritesheet(), 0, 90, 12, 15));
+        Image btnIcon;
+        // 현우(WARRIOR)일 경우 64x16 규격에 맞춘 1/4 비율 절삭 로직 적용
+        if (cl == com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass.WARRIOR) {
+            btnIcon = new Image(cl.spritesheet());
+            com.watabou.utils.RectF frame = new com.watabou.utils.RectF(btnIcon.frame());
+            frame.right = frame.left + (frame.width() / 4f);
+            btnIcon.frame(frame);
+        } else {
+            // 기존 영웅들은 원본의 12x15 하드코딩 방식 유지
+            btnIcon = new Image(cl.spritesheet(), 0, 90, 12, 15);
+        }
 
-		}
+        icon(btnIcon);
+    }
 
-		@Override
-		public void update() {
-			super.update();
-			if (cl != GamesInProgress.selectedClass){
-				if (!cl.isUnlocked()){
-					icon.brightness(0.1f);
-				} else {
-					icon.brightness(0.6f);
-				}
-			} else {
-				icon.brightness(1f);
-			}
-		}
+    @Override
+    public void update() {
+        super.update();
+        if (cl != GamesInProgress.selectedClass){
+            if (!cl.isUnlocked()){
+                icon.brightness(0.1f);
+            } else {
+                icon.brightness(0.6f);
+            }
+        } else {
+            icon.brightness(1f);
+        }
+    }
 
-		@Override
-		protected void onClick() {
-			super.onClick();
+    @Override
+    protected void onClick() {
+        super.onClick();
 
-			if( !cl.isUnlocked() ){
-				ShatteredPixelDungeon.scene().addToFront( new WndMessage(cl.unlockMsg()));
-			} else if (GamesInProgress.selectedClass == cl) {
-				Window w = new WndHeroInfo(cl);
-				if (landscape()){
-					w.offset(Camera.main.width/6, 0);
-				}
-				ShatteredPixelDungeon.scene().addToFront(w);
-			} else {
-				setSelectedHero(cl);
-			}
-		}
+        if( !cl.isUnlocked() ){
+            ShatteredPixelDungeon.scene().addToFront( new WndMessage(cl.unlockMsg()));
+        } else if (GamesInProgress.selectedClass == cl) {
+            Window w = new WndHeroInfo(cl);
+            if (landscape()){
+                w.offset(Camera.main.width/6, 0);
+            }
+            ShatteredPixelDungeon.scene().addToFront(w);
+        } else {
+            setSelectedHero(cl);
+        }
+    }
 
-		@Override
-		protected void layout() {
-			super.layout();
-			//if we're super tall (i.e. rendering into display inset) then put hero at the top
-			if (height > 30) {
-				icon.y = y + (HEIGHT - icon.height()) / 2f;
-			}
-		}
-	}
+    @Override
+    protected void layout() {
+        super.layout();
+        //if we're super tall (i.e. rendering into display inset) then put hero at the top
+        if (height > 30) {
+            icon.y = y + (HEIGHT - icon.height()) / 2f;
+        }
+    }
+}
 
 	private class GameOptions extends Component {
 
