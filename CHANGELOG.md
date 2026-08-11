@@ -1,3 +1,9 @@
+### 🕒 2026-08-11 23:01:41 KST
+- 전사 공용특성 폴리싱 (b5991fc)
+Updated titles for talents in Korean localization.
+
+---
+
 ### 🕒 2026-08-11 22:58:56 KST
 - 전사 공용 특성 변경 관련 계획 (fe5c6b2)
 
