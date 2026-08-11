@@ -1,3 +1,9 @@
+### 🕒 2026-08-11 23:17:36 KST
+- Document character development milestones for Hyunwoo (aa2848a)
+Added version history and milestones for Hyunwoo character development.
+
+---
+
 ### 🕒 2026-08-11 23:01:41 KST
 - 전사 공용특성 폴리싱 (b5991fc)
 Updated titles for talents in Korean localization.
