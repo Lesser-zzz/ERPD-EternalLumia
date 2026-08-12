@@ -1,3 +1,8 @@
+### 🕒 2026-08-12 18:43:04 KST
+- Update appVersionName to '0.0.4' (9583ddb)
+
+---
+
 ### 🕒 2026-08-11 23:52:22 KST
 - Document game development updates in DEVLOG (6c13b89)
 Updated DEVLOG with recent progress and changes to the game.
