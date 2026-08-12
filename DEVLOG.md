@@ -33,3 +33,4 @@ splashes에서 배경도 고침. 800 450으로 넣어야해서 애초에 16:9로
 
 260812
 https://gall.dcinside.com/mgallery/board/view/?id=spd&no=82176 버그제보
+dev -dogfight.java 수정햇음. hero.java랑 fury.java 수정 해야함. 기존 능동 광폭화에서 사망유예(필사즉생) 수동형으로 변경 예정
