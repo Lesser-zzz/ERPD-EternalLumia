@@ -1,3 +1,9 @@
+### 🕒 2026-08-12 22:56:06 KST
+- Document bug report and planned code changes (5ad9e0a)
+Updated DEVLOG with bug report and planned changes for dogfight.java, hero.java, and fury.java.
+
+---
+
 ### 🕒 2026-08-12 22:22:08 KST
 - Update DEVLOG.md (ca5024c)
 
