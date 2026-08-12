@@ -48,6 +48,15 @@ public class Dogfight extends Buff {
     // 발동 준비 완료 여부
     private boolean ready = false;
 
+	public int totalActivations = 0;
+    public int cooldownTurns = 0; 
+
+    private static final String STACK = "dogfightStack";
+    private static final String READY = "ready";
+    // 👉 세이브 키 값도 추가합니다!
+    private static final String TOTAL_ACT = "totalActivations";
+    private static final String CD_TURNS = "cooldownTurns";
+
     // icon 추가
     @Override
     public int icon() {
@@ -326,6 +335,15 @@ public class Dogfight extends Buff {
         ready = bundle.getBoolean(READY);
 
     }
+	//필사즉생 쿨다운 넣기 위함
+	@Override
+	public boolean act() {
+	    if (cooldownTurns > 0) {
+	        cooldownTurns--;
+	        BuffIndicator.refreshHero();
+	    }
+	    return super.act();
+	}
 
     
 
@@ -337,6 +355,17 @@ public class Dogfight extends Buff {
         dogfightStack = 0;
         ready = false;
 
+		// 영웅이 광전사(멧돼지 현우)로 전직한 상태라면 전직 후부터 체력 스택 증가
+	    if (target instanceof com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero) {
+	        com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero hero = (com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero) target;
+	
+	        if (hero.subClass == com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass.BERSERKER) {
+	            totalActivations++;
+	            hero.HT += 1; // 최대 체력 1 증가
+	
+	        }
+	    }
+		
         BuffIndicator.refreshHero();
 
     }
