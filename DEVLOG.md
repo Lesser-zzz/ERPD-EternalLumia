@@ -29,3 +29,7 @@ avatars.png는 게임 클리어 후 나오는 이미지래...
 
 260811
 splashes에서 배경도 고침. 800 450으로 넣어야해서 애초에 16:9로 조절 후 pisekl 가서 변환 하면 댐. 공용 특성 폴리싱도 얼추 함. v0.0.4 끝!
+
+
+260812
+https://gall.dcinside.com/mgallery/board/view/?id=spd&no=82176 버그제보
