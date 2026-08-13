@@ -1,4 +1,4 @@
-/**
+	/**
  * Hyunwoo's passive skill.
  *
  * Gain stacks by landing attacks.
@@ -53,6 +53,7 @@ public class Dogfight extends Buff {
 
     private static final String STACK = "dogfightStack";
     private static final String READY = "ready";
+	private static final String REQUIRED = "requiredHits"; // <- 아래에 있던 걸 위로 가져와 통합!
     // 👉 세이브 키 값도 추가합니다!
     private static final String TOTAL_ACT = "totalActivations";
     private static final String CD_TURNS = "cooldownTurns";
@@ -318,10 +319,6 @@ public class Dogfight extends Buff {
 	    }
 
     //게임 껏다 켜도 스택이 유지되도록 해야함
-
-    private static final String STACK = "dogfight_stack";
-    private static final String REQUIRED = "dogfight_required";
-    private static final String READY = "dogfight_ready";
 
 
     @Override
