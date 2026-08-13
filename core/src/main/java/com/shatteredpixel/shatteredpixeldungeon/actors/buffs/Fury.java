@@ -12,8 +12,7 @@ public class Fury extends FlavourBuff {
         if (target instanceof Hero) {
             Hero hero = (Hero) target;
             
-            // 현우에게 방어막 버프가 아예 떨어져 나갔는지(null) 확인합니다.
-            // (구버전은 쉴드가 0이 되면 Barrier 버프 객체 자체가 사라집니다)
+            // 현우에게 방어막이 완전히 사라졌는지(null) 체크
             if (hero.buff(Barrier.class) == null) {
                 detach(); // 보호막 깨짐 = 필생즉사 강제 종료!
                 return true; 
@@ -30,6 +29,13 @@ public class Fury extends FlavourBuff {
         if (target instanceof Hero) {
             Hero hero = (Hero) target;
             
+            // ⭐ [복구 1] 뻥튀기했던 근력(STR) 5 다시 원상복구
+            hero.STR -= 5;
+            
+            // ⭐ [복구 2] 쉴드가 깨져서 조기 종료된 경우, 남은 신속(Haste) 버프도 강제로 삭제
+            Haste haste = hero.buff(Haste.class);
+            if (haste != null) haste.detach();
+
             // 탈진: 5턴 간 시야 감소(Blindness)와 이동속도 감소(Cripple) 디버프 부여
             Buff.affect(hero, Blindness.class, 5f);
             Buff.affect(hero, Cripple.class, 5f);
