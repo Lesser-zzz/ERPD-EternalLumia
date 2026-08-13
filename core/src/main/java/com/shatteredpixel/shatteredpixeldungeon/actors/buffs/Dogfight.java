@@ -321,6 +321,8 @@ public class Dogfight extends Buff {
         bundle.put(STACK, dogfightStack);
         bundle.put(REQUIRED, requiredHits);
         bundle.put(READY, ready);
+		bundle.put(TOTAL_ACT, totalActivations);
+		bundle.put(CD_TURNS, cooldownTurns);
 
     }
 
@@ -333,6 +335,8 @@ public class Dogfight extends Buff {
         dogfightStack = bundle.getInt(STACK);
         requiredHits = bundle.getInt(REQUIRED);
         ready = bundle.getBoolean(READY);
+		totalActivations = bundle.getInt(TOTAL_ACT);
+		cooldownTurns = bundle.getInt(CD_TURNS);
 
     }
 	//필사즉생 쿨다운 넣기 위함
