@@ -2300,41 +2300,49 @@ public class Hero extends Char {
 	private Fury fury;
 
 	@Override
-	public boolean isAlive() {
-	    if (HP <= 0) {
-	        // 광전사(멧돼지 현우) 전직 상태일 때
-	        if (subClass == HeroSubClass.BERSERKER) {
-	            if (fury == null) fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
-	
-	            // 도그파이트 버프 및 쿨다운(100턴 회복 중) 상태 확인
-	            Dogfight dogfight = buff(Dogfight.class);
-	            boolean isOnCooldown = (dogfight != null && dogfight.cooldownTurns > 0);
-	
-	            // 쿨다운 상태가 아니고, 현재 필생즉사 버프가 없는 사망 위기라면 필생즉사 발동!
-	            if (fury == null && !buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class) && !isOnCooldown) {
-	                Buff.affect(this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 15f); // 15턴간 필생즉사 지속
-	                HP = 1; // 체력 1 고정으로 극적 생존 판정
+    public boolean isAlive() {
+        if (HP <= 0) {
+            // 광전사(글러브 현우) 전직 상태일 때
+            if (subClass == HeroSubClass.BERSERKER) {
 
-					// 도그파이트 발동 횟수 * 5 만큼의 방어막(Barrier)을 씌워줍니다.
+                // 1. 도그파이트 버프를 가져와 100턴 쿨다운(cooldownTurns) 유무 확인
+                com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight dogfight = 
+                    buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight.class);
+                boolean isOnCooldown = (dogfight != null && dogfight.cooldownTurns > 0);
+
+                // 2. 쿨다운이 아니고, 현재 필생즉사(Fury) 버프가 적용 중이지 않은 첫 사망 위기일 때 발동
+                if (fury == null && buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class) == null && !isOnCooldown) {
+
+                    HP = 1; // 체력 1 고정으로 생존
+
+                    // 15턴간 필생즉사 버프 부여
+                    com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+                        this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 15f
+                    );
+
+                    // 도그파이트 발동 횟수 * 5 만큼 보호막 부여
                     int shieldAmount = (dogfight != null) ? dogfight.totalActivations * 5 : 0;
                     if (shieldAmount > 0) {
-                        Buff.affect(this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier.class).incShield(shieldAmount);
+                        com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+                            this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier.class
+                        ).incShield(shieldAmount);
                     }
-					
-	                sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.actors.charSprites.CharSprite.POSITIVE, "필생즉사!");
-	                fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
-	            }
-	
-	            // 필생즉사 버프가 켜져 있는 동안은 죽지 않고 살려둡니다.
-	            return fury != null;
-	        }
-	    } else {
-	        fury = null;
-	    }
-	
-	    // 그 외 일반 상황(체력이 남아있거나 다른 직업인 경우)은 기본 생존 판정을 따릅니다.
-	    return super.isAlive();
-	}
+
+                    // 텍스트 출력 (CharSprite 패시브 경로 수정 완료)
+                    sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite.POSITIVE, "필생즉사!");
+                    fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
+                }
+
+                // 필생즉사 버프가 들어있는 동안 사망하지 않음
+                return fury != null;
+            }
+        } else {
+            // HP가 1 이상일 때 다음 발동을 위해 변수 비우기
+            fury = null;
+        }
+
+        return super.isAlive();
+    }
 	
 	@Override
 	public void move(int step, boolean travelling) {
