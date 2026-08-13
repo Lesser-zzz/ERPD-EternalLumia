@@ -269,18 +269,36 @@ public class Dogfight extends Buff {
 
             Hero hero = (Hero) target;
 
+            // Dogfight.java 내부의 desc() 메서드 수정
+
+    @Override
+    public String desc() {
+        // 기존: 영웅이 광전사인지 확인하고 설명을 다르게 출력하는 로직
+        if (target instanceof Hero) {
+            Hero hero = (Hero) target;
+
             if (hero.subClass == HeroSubClass.BERSERKER) {
-
-                return Messages.get(this, "boar_desc",
-                        requiredHits);
-
+                // 1. 기본 설명 (기존의 boar_desc를 가져옴)
+                String baseDesc = Messages.get(this, "boar_desc", requiredHits);
+                
+                // 2. [추가] 영구 스탯 상승 표기
+                String statsDesc = "\n\n[현재 상태]\n- 누적 발동 횟수: " + totalActivations + "회\n- 증가한 최대 체력: " + totalActivations + " HT";
+                
+                // 3. [추가] 필생즉사 쿨다운 표기
+                if (cooldownTurns > 0) {
+                    statsDesc += "\n\n 필생즉사 쿨다운: " + cooldownTurns + "턴 남음";
+                } else {
+                    statsDesc += "\n\n 필생즉사 발동 가능 (사망 위기 시 자동 발동)";
+                }
+                
+                return baseDesc + statsDesc;
             }
-
         }
 
-        return Messages.get(this, "desc",
-                requiredHits);    
+        // 광전사가 아닐 때의 기본 설명
+        return Messages.get(this, "desc", requiredHits);   
     }
+
    
 
     /**
