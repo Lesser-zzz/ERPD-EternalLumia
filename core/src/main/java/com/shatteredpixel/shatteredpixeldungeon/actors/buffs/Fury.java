@@ -6,20 +6,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 
 public class Fury extends FlavourBuff {
 
-    // [복구 1] 15턴 동안 공격력(피해량) 30% 증폭! 
-    // 구버전 엔진에서 공격력을 올릴 때 쓰는 기본 제공 메서드입니다.
-    @Override
-    public int attackFactor() {
-        return 130; // 기본 100 기준 130%
-    }
-
-    // [복구 2] 15턴 동안 이동 속도 40% 증가! (턴 소모량 감소)
-    @Override
-    public float speedFactor() {
-        return 1.4f; // 이동 속도 1.4배
-    }
-
-    // [복구 3] 매 턴 체크: 보호막이 깨지면 15턴이 안 지났어도 버프 즉시 종료!
+    // 매 턴 체크: 15턴이 지나지 않았더라도 보호막이 깨지면 즉시 버프 종료!
     @Override
     public boolean act() {
         if (target instanceof Hero) {
@@ -35,7 +22,7 @@ public class Fury extends FlavourBuff {
         return super.act();
     }
 
-    // [복구 4] 버프 종료 시 효과 (15턴 경과 or 쉴드 파괴 시)
+    // 버프 종료 시 효과 (15턴 경과 or 쉴드 파괴 시)
     @Override
     public void detach() {
         super.detach();
