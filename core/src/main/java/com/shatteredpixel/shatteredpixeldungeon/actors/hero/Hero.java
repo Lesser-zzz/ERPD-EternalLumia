@@ -47,6 +47,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Combo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Drowsy;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Foresight;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.GreaterHaste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.HeroDisguise;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.HoldFast;
@@ -2294,20 +2295,40 @@ public class Hero extends Char {
 	//effectively cache this buff to prevent having to call buff(...) a bunch.
 	//This is relevant because we call isAlive during drawing, which has both performance
 	//and thread coordination implications if that method calls buff(...) frequently
-	private Berserk berserk;
+	//private Berserk berserk;
+
+	private Fury fury;
 
 	@Override
 	public boolean isAlive() {
-		
-		if (HP <= 0){
-			if (berserk == null) berserk = buff(Berserk.class);
-			return berserk != null && berserk.berserking();
-		} else {
-			berserk = null;
-			return super.isAlive();
-		}
+	    if (HP <= 0) {
+	        // 광전사(멧돼지 현우) 전직 상태일 때
+	        if (subClass == HeroSubClass.BERSERKER) {
+	            if (fury == null) fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
+	
+	            // 도그파이트 버프 및 쿨다운(100턴 회복 중) 상태 확인
+	            Dogfight dogfight = buff(Dogfight.class);
+	            boolean isOnCooldown = (dogfight != null && dogfight.cooldownTurns > 0);
+	
+	            // 쿨다운 상태가 아니고, 현재 필생즉사 버프가 없는 사망 위기라면 필생즉사 발동!
+	            if (fury == null && !buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class) && !isOnCooldown) {
+	                Buff.affect(this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 5f); // 5턴간 필생즉사 지속
+	                HP = 1; // 체력 1 고정으로 극적 생존 판정
+	                sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.actors.charSprites.CharSprite.POSITIVE, "필생즉사!");
+	                fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
+	            }
+	
+	            // 필생즉사 버프가 켜져 있는 동안은 죽지 않고 살려둡니다.
+	            return fury != null;
+	        }
+	    } else {
+	        fury = null;
+	    }
+	
+	    // 그 외 일반 상황(체력이 남아있거나 다른 직업인 경우)은 기본 생존 판정을 따릅니다.
+	    return super.isAlive();
 	}
-
+	
 	@Override
 	public void move(int step, boolean travelling) {
 		boolean wasHighGrass = Dungeon.level.map[step] == Terrain.HIGH_GRASS;
