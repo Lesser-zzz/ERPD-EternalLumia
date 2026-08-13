@@ -2320,6 +2320,14 @@ public class Hero extends Char {
                         this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 15f
                     );
 
+					// ⭐ [추가 1] 이동속도 뽕맛: 엔진에 내장된 '신속(Haste)' 버프 15턴 동시 부여!
+                    com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+                        this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste.class, 15f
+                    );
+
+                    // ⭐ [추가 2] 공격력 뽕맛: 근력(STR)을 임시로 5 뻥튀기! (무기 데미지 대폭 상승)
+                    this.STR += 5; // 5가 아쉬우면 10으로 올려도 됩니다!
+
                     // 도그파이트 발동 횟수 * 5 만큼 보호막 부여
                     int shieldAmount = (dogfight != null) ? dogfight.totalActivations * 5 : 0;
                     if (shieldAmount > 0) {
