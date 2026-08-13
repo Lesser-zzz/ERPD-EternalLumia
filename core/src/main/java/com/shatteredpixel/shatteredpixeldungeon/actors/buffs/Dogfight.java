@@ -262,13 +262,6 @@ public class Dogfight extends Buff {
 
 
     // 독파 설명    
-    @Override
-    public String desc() {
-
-        if (target instanceof Hero) {
-
-            Hero hero = (Hero) target;
-
             // Dogfight.java 내부의 desc() 메서드 수정
 
     @Override
