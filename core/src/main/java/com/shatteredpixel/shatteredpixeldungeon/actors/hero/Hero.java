@@ -2312,8 +2312,15 @@ public class Hero extends Char {
 	
 	            // 쿨다운 상태가 아니고, 현재 필생즉사 버프가 없는 사망 위기라면 필생즉사 발동!
 	            if (fury == null && !buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class) && !isOnCooldown) {
-	                Buff.affect(this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 5f); // 5턴간 필생즉사 지속
+	                Buff.affect(this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 15f); // 15턴간 필생즉사 지속
 	                HP = 1; // 체력 1 고정으로 극적 생존 판정
+
+					// 도그파이트 발동 횟수 * 5 만큼의 방어막(Barrier)을 씌워줍니다.
+                    int shieldAmount = (dogfight != null) ? dogfight.totalActivations * 5 : 0;
+                    if (shieldAmount > 0) {
+                        Buff.affect(this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier.class).incShield(shieldAmount);
+                    }
+					
 	                sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.actors.charSprites.CharSprite.POSITIVE, "필생즉사!");
 	                fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
 	            }
