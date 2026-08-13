@@ -44,7 +44,9 @@ import com.watabou.utils.Bundle;
 import com.watabou.utils.GameMath;
 import com.watabou.utils.Random;
 
-public class Berserk extends ShieldBuff implements ActionIndicator.Action {
+//버튼 안 나오게 수정
+//public class Berserk extends ShieldBuff implements ActionIndicator.Action {
+public class Berserk extends ShieldBuff {
 
 	{
 		type = buffType.POSITIVE;
@@ -172,14 +174,15 @@ public class Berserk extends ShieldBuff implements ActionIndicator.Action {
 	public float damageFactor(float dmg){
 		return dmg * Math.min(1.5f, 1f + (power / 2f));
 	}
-
+//광폭화 차단
 	public boolean berserking(){
-		if (target.HP == 0
-				&& state == State.NORMAL
-				&& power >= 1f
-				&& ((Hero)target).hasTalent(Talent.DEATHLESS_FURY)){
-			startBerserking();
-			ActionIndicator.clearAction(this);
+		// if (target.HP == 0
+		// 		&& state == State.NORMAL
+		// 		&& power >= 1f
+		// 		&& ((Hero)target).hasTalent(Talent.DEATHLESS_FURY)){
+		// 	startBerserking();
+		// 	ActionIndicator.clearAction(this);
+		return false;
 		}
 
 		return state == State.BERSERK && target.shielding() > 0;
@@ -234,14 +237,15 @@ public class Berserk extends ShieldBuff implements ActionIndicator.Action {
 	}
 	
 	public void damage(int damage){
-		if (state != State.NORMAL) return;
-		float maxPower = 1f + 0.1667f*((Hero)target).pointsInTalent(Talent.ENDLESS_RAGE);
-		power = Math.min(maxPower, power + (damage/(float)target.HT)/4f );
-		BuffIndicator.refreshHero(); //show new power immediately
-		powerLossBuffer = 3; //2 turns until rage starts dropping
-		if (power >= 1f){
-			ActionIndicator.setAction(this);
-		}
+		// if (state != State.NORMAL) return;
+		// float maxPower = 1f + 0.1667f*((Hero)target).pointsInTalent(Talent.ENDLESS_RAGE);
+		// power = Math.min(maxPower, power + (damage/(float)target.HT)/4f );
+		// BuffIndicator.refreshHero(); //show new power immediately
+		// powerLossBuffer = 3; //2 turns until rage starts dropping
+		// if (power >= 1f){
+		// 	ActionIndicator.setAction(this);
+		// }
+		return;
 	}
 
 	public void recover(float percent){
@@ -256,15 +260,16 @@ public class Berserk extends ShieldBuff implements ActionIndicator.Action {
 		}
 	}
 
-	@Override
-	public String actionName() {
-		return Messages.get(this, "action_name");
-	}
+	//충돌 할 수 있는 것들 꺼버림. 드래그 + ctrl + / 하면 단체 주석
+	// @Override
+	// public String actionName() {
+	// 	return Messages.get(this, "action_name");
+	// }
 
-	@Override
-	public int actionIcon() {
-		return HeroIcon.BERSERK;
-	}
+	// @Override
+	// public int actionIcon() {
+	// 	return HeroIcon.BERSERK;
+	// }
 
 	@Override
 	public Visual secondaryVisual() {
@@ -275,21 +280,21 @@ public class Berserk extends ShieldBuff implements ActionIndicator.Action {
 		return txt;
 	}
 
-	@Override
-	public int indicatorColor() {
-		return 0x660000;
-	}
+	// @Override
+	// public int indicatorColor() {
+	// 	return 0x660000;
+	// }
 
-	@Override
-	public void doAction() {
-		WarriorShield shield = target.buff(WarriorShield.class);
-		if (shield != null && shield.maxShield() > 0) {
-			startBerserking();
-			ActionIndicator.clearAction(this);
-		} else {
-			GLog.w(Messages.get(this, "no_seal"));
-		}
-	}
+	// @Override
+	// public void doAction() {
+	// 	WarriorShield shield = target.buff(WarriorShield.class);
+	// 	if (shield != null && shield.maxShield() > 0) {
+	// 		startBerserking();
+	// 		ActionIndicator.clearAction(this);
+	// 	} else {
+	// 		GLog.w(Messages.get(this, "no_seal"));
+	// 	}
+	// }
 
 	@Override
 	public int icon() {
