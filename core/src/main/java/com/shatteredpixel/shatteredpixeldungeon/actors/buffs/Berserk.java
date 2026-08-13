@@ -1,77 +1,53 @@
+/*
+ * Pixel Dungeon
+ * Copyright (C) 2012-2015 Oleg Dolya
+ *
+ * Shattered Pixel Dungeon
+ * Copyright (C) 2014-2026 Evan Debenham
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/
+ */
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.ui.ActionIndicator;
-import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.watabou.utils.Bundle;
 
-public class Berserk extends ShieldBuff implements ActionIndicator.Action {
+public class Berserk extends ShieldBuff {
 
 	{
 		type = buffType.POSITIVE;
 		detachesAtZero = false;
-		shieldUsePriority = -1;
 	}
 
 	@Override
 	public boolean act() {
-		// 원본 분노 감소/회복 로직 무력화
 		spend(TICK);
 		return true;
 	}
 
 	@Override
 	public void damage(int damage) {
-		// 피격 시 분노 게이지 차오르는 로직 무력화
+		// 피격 시 분노 게이지가 차오르는 원본 로직 원천 차단
 	}
 
 	public boolean berserking() {
-		// 원본 광폭화 진입 완전 차단 (우리는 Fury.java와 Hero.isAlive()로 대체함)
+		// 원본 광폭화 진입 판정 완전 차단 (현우는 Fury.java와 Hero.isAlive()로 대체됨)
 		return false;
 	}
 
 	@Override
-	public String actionName() {
-		return "";
-	}
-
-	@Override
-	public int actionIcon() {
-		return 0;
-	}
-
-	@Override
-	public int indicatorColor() {
-		return 0;
-	}
-
-	@Override
-	public void doAction() {
-		// 하단 액티브 버튼 동작 무력화
-	}
-
-	@Override
 	public int icon() {
-		return BuffIndicator.BERSERK;
-	}
-
-	@Override
-	public String name() {
-		return "멧돼지 현우";
-	}
-
-	@Override
-	public String desc() {
-		return "실전 압축 근육 현우의 패시브 상태입니다.";
-	}
-
-	@Override
-	public void storeInBundle(Bundle bundle) {
-		super.storeInBundle(bundle);
-	}
-
-	@Override
-	public void restoreFromBundle(Bundle bundle) {
-		super.restoreFromBundle(bundle);
+		// 버프 목록이나 UI에 아이콘이 아예 뜨지 않도록 -1 반환 (숨김 처리)
+		return -1;
 	}
 }
