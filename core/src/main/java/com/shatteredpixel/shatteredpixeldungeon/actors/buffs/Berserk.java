@@ -35,7 +35,7 @@ public class Berserk extends ShieldBuff {
 		return true;
 	}
 
-	@Override
+	// 👉 여기에 있던 @Override를 삭제했습니다! (에러 원인 해결)
 	public void damage(int damage) {
 		// 피격 시 분노 게이지 차오르는 원본 로직 무력화
 	}
