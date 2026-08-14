@@ -2300,57 +2300,62 @@ public class Hero extends Char {
 	private Fury fury;
 
 	@Override
-    public boolean isAlive() {
-        if (HP <= 0) {
-            // 광전사(글러브 현우) 전직 상태일 때
-            if (subClass == HeroSubClass.BERSERKER) {
+	public boolean isAlive() {
+		if (HP <= 0) {
+			// 광전사(글러브 현우) 전직 상태일 때
+			if (subClass == HeroSubClass.BERSERKER) {
 
-                // 1. 도그파이트 버프를 가져와 100턴 쿨다운(cooldownTurns) 유무 확인
-                com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight dogfight = 
-                    buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight.class);
-                boolean isOnCooldown = (dogfight != null && dogfight.cooldownTurns > 0);
+				// 1. 도그파이트 버프를 가져와 100턴 쿨다운(cooldownTurns) 유무 확인
+				com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight dogfight = 
+					buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight.class);
+				boolean isOnCooldown = (dogfight != null && dogfight.cooldownTurns > 0);
 
-                // 2. 쿨다운이 아니고, 현재 필생즉사(Fury) 버프가 적용 중이지 않은 첫 사망 위기일 때 발동
-                if (fury == null && buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class) == null && !isOnCooldown) {
+				// 2. 쿨다운이 아니고, 현재 필생즉사(Fury) 버프가 적용 중이지 않은 첫 사망 위기일 때 발동
+				if (fury == null && buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class) == null && !isOnCooldown) {
 
-                    HP = 1; // 체력 1 고정으로 생존
+					HP = 1; // 체력 1 고정으로 생존
 
-                    // 15턴간 필생즉사 버프 부여
-                    com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
-                        this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 15f
-                    );
+					// 15턴간 필생즉사 버프 부여
+					com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+						this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 15f
+					);
 
-					// ⭐ [추가 1] 이동속도 뽕맛: 엔진에 내장된 '신속(Haste)' 버프 15턴 동시 부여!
-                    com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
-                        this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste.class, 15f
-                    );
+					// 이동속도 뽕맛: 신속(Haste) 버프 15턴 동시 부여
+					com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+						this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste.class, 15f
+					);
 
-                    // ⭐ [추가 2] 공격력 뽕맛: 근력(STR)을 임시로 5 뻥튀기! (무기 데미지 대폭 상승)
-                    this.STR += 5; // 5가 아쉬우면 10으로 올려도 됩니다!
+					// 공격력 뽕맛: 근력(STR) 임시 5 상승
+					this.STR += 5;
 
-                    // 도그파이트 발동 횟수 * 5 만큼 보호막 부여
-                    int shieldAmount = (dogfight != null) ? dogfight.totalActivations * 5 : 0;
-                    if (shieldAmount > 0) {
-                        com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
-                            this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier.class
-                        ).incShield(shieldAmount);
-                    }
+					// 🛡️ [수정 핵심 1] 기본 보호막(15) + (도그파이트 발동 횟수 * 5)
+					// 스택이 0이어도 최소 15의 보호막을 부여하여 Fury.java가 1턴 만에 조기 종료되는 것을 방지합니다.
+					int baseShield = 15;
+					int bonusShield = (dogfight != null) ? dogfight.totalActivations * 5 : 0;
+					int totalShield = baseShield + bonusShield;
 
-                    // 텍스트 출력 (CharSprite 패시브 경로 수정 완료)
-                    sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite.POSITIVE, "필생즉사!");
-                    fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
-                }
+					com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+						this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier.class
+					).incShield(totalShield);
 
-                // 필생즉사 버프가 들어있는 동안 사망하지 않음
-                return fury != null;
-            }
-        } else {
-            // HP가 1 이상일 때 다음 발동을 위해 변수 비우기
-            fury = null;
-        }
+					// 🛡️ [수정 핵심 2] sprite 널 체크 방어막 (전격 함정 등 튕김 원천 차단)
+					if (sprite != null) {
+						sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite.POSITIVE, "필생즉사!");
+					}
+					
+					fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
+				}
 
-        return super.isAlive();
-    }
+				// 필생즉사 버프가 들어있는 동안 사망하지 않음
+				return fury != null;
+			}
+		} else {
+			// HP가 1 이상일 때 다음 발동을 위해 변수 비우기
+			fury = null;
+		}
+
+		return super.isAlive();
+	}
 	
 	@Override
 	public void move(int step, boolean travelling) {
