@@ -37,17 +37,37 @@ public class Berserk extends ShieldBuff {
 
 	@Override
 	public void damage(int damage) {
-		// 피격 시 분노 게이지가 차오르는 원본 로직 원천 차단
+		// 피격 시 분노 게이지 차오르는 원본 로직 무력화
 	}
 
 	public boolean berserking() {
-		// 원본 광폭화 진입 판정 완전 차단 (현우는 Fury.java와 Hero.isAlive()로 대체됨)
+		// 원본 광폭화 진입 무력화 (무조건 false)
 		return false;
+	}
+
+	// ========================================================
+	// [컴파일 에러 방어용 더미(Dummy) 메서드들]
+	// 다른 클래스들이 광전사의 스탯 변화를 요구할 때, 아무 변화 없이 원본 값 그대로 돌려줍니다.
+	// ========================================================
+
+	// 1. Char.java 에서 찾는 데미지 증폭 메서드 (데미지 그대로 반환)
+	public float damageFactor(float dmg) {
+		return dmg;
+	}
+
+	// 2. Hero.java 에서 찾는 체력 회복 시 분노 관리 메서드 (아무 일도 안 함)
+	public void recover(float percent) {
+		// Do nothing
+	}
+
+	// 3. Weapon.java 에서 찾는 인챈트 확률 보정 메서드 (확률 그대로 반환)
+	public float enchantFactor(float multi) {
+		return multi;
 	}
 
 	@Override
 	public int icon() {
-		// 버프 목록이나 UI에 아이콘이 아예 뜨지 않도록 -1 반환 (숨김 처리)
+		// UI에 아이콘이 아예 뜨지 않도록 숨김 처리
 		return -1;
 	}
 }
