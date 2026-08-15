@@ -347,16 +347,22 @@ public class Dogfight extends Buff {
 		cooldownTurns = bundle.getInt(CD_TURNS);
 
     }
-	//필사즉생 쿨다운 넣기 위함
+	// 필생즉사 쿨다운 매 턴 감소
 	@Override
 	public boolean act() {
-	    if (cooldownTurns > 0) {
-	        cooldownTurns--;
-	        BuffIndicator.refreshHero();
-	    }
-	    return super.act();
+		if (cooldownTurns > 0) {
+			cooldownTurns--;
+			
+			// 매 턴 UI를 새로고침하면 렉이 걸릴 수 있으므로, 쿨다운이 0이 딱 되었을 때만 UI를 갱신합니다!
+			if (cooldownTurns == 0) {
+				com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator.refreshHero();
+			}
+		}
+		
+		// ⭐ [핵심] 엔진에게 "1턴(TICK)이 지날 때마다 나를 다시 불러줘!" 라고 예약하는 필수 코드
+		spend( TICK );
+		return true; // 버프가 사라지지 않고 계속 유지되도록 true 반환
 	}
-
     
 
     /**
