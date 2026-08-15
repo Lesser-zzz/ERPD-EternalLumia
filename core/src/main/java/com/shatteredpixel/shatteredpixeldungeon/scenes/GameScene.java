@@ -881,17 +881,21 @@ public class GameScene extends PixelScene {
 				GLog.i("개발자용 무한 스타터팩 지급 완료!");
 			}
 
-			// 'F5' 키: 텐구의 가면(전직의 서) 즉시 지급 치트!
-			if (com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon.debug && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F5)) {
+			// 'F5' 키: 텐구의 가면 즉시 지급 치트!
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F5)) {
 			    
-			    // 전직의 서(텐구의 가면) 생성 및 가방에 추가
-			    com.shatteredpixel.shatteredpixeldungeon.items.TomeOfMastery tome = new com.shatteredpixel.shatteredpixeldungeon.items.TomeOfMastery();
-			    if (com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.belongings.backpack.tryAdd(tome)) {
-			        com.shatteredpixel.shatteredpixeldungeon.ui.GameLog.i("디버그: 텐구의 가면을 획득했습니다!");
+			    // 바닐라의 전직의 서 대신 SPD 엔진에 맞는 '텐구의 가면(TengusMask)'을 소환합니다.
+			    com.shatteredpixel.shatteredpixeldungeon.items.TengusMask mask = new com.shatteredpixel.shatteredpixeldungeon.items.TengusMask();
+			    
+			    // 가방에 넣기 시도 후 GLog를 통해 화면 메시지 출력
+			    if (com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.belongings.backpack.tryAdd(mask)) {
+			        com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 텐구의 가면을 획득했습니다!");
 			    } else {
-			        com.shatteredpixel.shatteredpixeldungeon.ui.GameLog.w("디버그: 가방이 가득 찼습니다!");
+			        com.shatteredpixel.shatteredpixeldungeon.utils.GLog.w("디버그: 가방이 가득 찼습니다!");
 			    }
 			}
+
+			
 		}
 		// =========================================================
 
