@@ -47,6 +47,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Combo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Drowsy;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Foresight;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.GreaterHaste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.HeroDisguise;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.HoldFast;
@@ -2294,20 +2295,68 @@ public class Hero extends Char {
 	//effectively cache this buff to prevent having to call buff(...) a bunch.
 	//This is relevant because we call isAlive during drawing, which has both performance
 	//and thread coordination implications if that method calls buff(...) frequently
-	private Berserk berserk;
+	//private Berserk berserk;
+
+	private Fury fury;
 
 	@Override
 	public boolean isAlive() {
-		
-		if (HP <= 0){
-			if (berserk == null) berserk = buff(Berserk.class);
-			return berserk != null && berserk.berserking();
-		} else {
-			berserk = null;
-			return super.isAlive();
-		}
-	}
+		if (HP <= 0) {
+			// 광전사(글러브 현우) 전직 상태일 때
+			if (subClass == HeroSubClass.BERSERKER) {
 
+				// 1. 도그파이트 버프를 가져와 100턴 쿨다운(cooldownTurns) 유무 확인
+				com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight dogfight = 
+					buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight.class);
+				boolean isOnCooldown = (dogfight != null && dogfight.cooldownTurns > 0);
+
+				// 2. 쿨다운이 아니고, 현재 필생즉사(Fury) 버프가 적용 중이지 않은 첫 사망 위기일 때 발동
+				if (fury == null && buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class) == null && !isOnCooldown) {
+
+					HP = 1; // 체력 1 고정으로 생존
+
+					// 15턴간 필생즉사 버프 부여
+					com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+						this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 15f
+					);
+
+					// 이동속도 뽕맛: 신속(Haste) 버프 15턴 동시 부여
+					com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+						this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste.class, 15f
+					);
+
+					// 공격력 뽕맛: 근력(STR) 임시 5 상승
+					this.STR += 5;
+
+					// 🛡️ [수정 핵심 1] 기본 보호막(15) + (도그파이트 발동 횟수 * 5)
+					// 스택이 0이어도 최소 15의 보호막을 부여하여 Fury.java가 1턴 만에 조기 종료되는 것을 방지합니다.
+					int baseShield = 15;
+					int bonusShield = (dogfight != null) ? dogfight.totalActivations * 5 : 0;
+					int totalShield = baseShield + bonusShield;
+
+					com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
+						this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier.class
+					).incShield(totalShield);
+
+					// 🛡️ [수정 핵심 2] sprite 널 체크 방어막 (전격 함정 등 튕김 원천 차단)
+					if (sprite != null) {
+						sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite.POSITIVE, "필생즉사!");
+					}
+					
+					fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
+				}
+
+				// 필생즉사 버프가 들어있는 동안 사망하지 않음
+				return fury != null;
+			}
+		} else {
+			// HP가 1 이상일 때 다음 발동을 위해 변수 비우기
+			fury = null;
+		}
+
+		return super.isAlive();
+	}
+	
 	@Override
 	public void move(int step, boolean travelling) {
 		boolean wasHighGrass = Dungeon.level.map[step] == Terrain.HIGH_GRASS;

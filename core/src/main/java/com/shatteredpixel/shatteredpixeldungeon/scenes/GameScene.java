@@ -880,6 +880,20 @@ public class GameScene extends PixelScene {
 				// ⑤ 획득 완료 알림창
 				GLog.i("개발자용 무한 스타터팩 지급 완료!");
 			}
+
+			// 'F5' 키: 텐구의 가면(전직의 서) 즉시 지급 치트!
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F5)) {
+			    
+			    // 바닐라의 전직의 서 대신 SPD 엔진에 맞는 '텐구의 가면(TengusMask)'을 소환합니다.
+			    com.shatteredpixel.shatteredpixeldungeon.items.TengusMask mask = new com.shatteredpixel.shatteredpixeldungeon.items.TengusMask();
+			    
+			    // 엔진 정석 로직: collect()를 호출하여 가방에 넣습니다. (가방이 꽉 차면 발밑에 떨어집니다)
+			    mask.collect();
+			    
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 텐구의 가면을 획득했습니다!");
+			}
+
+			
 		}
 		// =========================================================
 

@@ -1,4 +1,4 @@
-/**
+	/**
  * Hyunwoo's passive skill.
  *
  * Gain stacks by landing attacks.
@@ -47,6 +47,16 @@ public class Dogfight extends Buff {
 
     // 발동 준비 완료 여부
     private boolean ready = false;
+
+	public int totalActivations = 0;
+    public int cooldownTurns = 0; 
+
+    private static final String STACK = "dogfightStack";
+    private static final String READY = "ready";
+	private static final String REQUIRED = "requiredHits"; // <- 아래에 있던 걸 위로 가져와 통합!
+    // 👉 세이브 키 값도 추가합니다!
+    private static final String TOTAL_ACT = "totalActivations";
+    private static final String CD_TURNS = "cooldownTurns";
 
     // icon 추가
     @Override
@@ -253,25 +263,36 @@ public class Dogfight extends Buff {
 
 
     // 독파 설명    
+            // Dogfight.java 내부의 desc() 메서드 수정
+
     @Override
     public String desc() {
-
+        // 기존: 영웅이 광전사인지 확인하고 설명을 다르게 출력하는 로직
         if (target instanceof Hero) {
-
             Hero hero = (Hero) target;
 
             if (hero.subClass == HeroSubClass.BERSERKER) {
-
-                return Messages.get(this, "boar_desc",
-                        requiredHits);
-
+                // 1. 기본 설명 (기존의 boar_desc를 가져옴)
+                String baseDesc = Messages.get(this, "boar_desc", requiredHits);
+                
+                // 2. [추가] 영구 스탯 상승 표기
+                String statsDesc = "\n\n[현재 상태]\n- 누적 발동 횟수: " + totalActivations + "회\n- 증가한 최대 체력: " + totalActivations + " HT";
+                
+                // 3. [추가] 필생즉사 쿨다운 표기
+                if (cooldownTurns > 0) {
+                    statsDesc += "\n\n 필생즉사 쿨다운: " + cooldownTurns + "턴 남음";
+                } else {
+                    statsDesc += "\n\n 필생즉사 발동 가능 (사망 위기 시 자동 발동)";
+                }
+                
+                return baseDesc + statsDesc;
             }
-
         }
 
-        return Messages.get(this, "desc",
-                requiredHits);    
+        // 광전사가 아닐 때의 기본 설명
+        return Messages.get(this, "desc", requiredHits);   
     }
+
    
 
     /**
@@ -299,10 +320,6 @@ public class Dogfight extends Buff {
 
     //게임 껏다 켜도 스택이 유지되도록 해야함
 
-    private static final String STACK = "dogfight_stack";
-    private static final String REQUIRED = "dogfight_required";
-    private static final String READY = "dogfight_ready";
-
 
     @Override
     public void storeInBundle(Bundle bundle) {
@@ -312,6 +329,8 @@ public class Dogfight extends Buff {
         bundle.put(STACK, dogfightStack);
         bundle.put(REQUIRED, requiredHits);
         bundle.put(READY, ready);
+		bundle.put(TOTAL_ACT, totalActivations);
+		bundle.put(CD_TURNS, cooldownTurns);
 
     }
 
@@ -324,9 +343,28 @@ public class Dogfight extends Buff {
         dogfightStack = bundle.getInt(STACK);
         requiredHits = bundle.getInt(REQUIRED);
         ready = bundle.getBoolean(READY);
+		totalActivations = bundle.getInt(TOTAL_ACT);
+		cooldownTurns = bundle.getInt(CD_TURNS);
 
     }
-
+	// 필생즉사 쿨다운 매 턴 감소
+	@Override
+	public boolean act() {
+		if (cooldownTurns > 0) {
+			cooldownTurns--;
+			
+			// 매 턴 UI를 새로고침하면 렉이 걸릴 수 있으므로, 쿨다운이 0이 딱 되었을 때만 UI를 갱신합니다!
+			if (cooldownTurns == 0) {
+				com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator.refreshHero();
+				// ⭐ [추가] 쿨다운이 끝나는 순간 긍정적인(초록색) 시스템 로그 출력!
+				com.shatteredpixel.shatteredpixeldungeon.utils.GLog.p("탈진에서 회복했습니다. 이제 다시 필생즉사가 발동할 수 있습니다!");
+			}
+		}
+		
+		// ⭐ [핵심] 엔진에게 "1턴(TICK)이 지날 때마다 나를 다시 불러줘!" 라고 예약하는 필수 코드
+		spend( TICK );
+		return true; // 버프가 사라지지 않고 계속 유지되도록 true 반환
+	}
     
 
     /**
@@ -337,6 +375,17 @@ public class Dogfight extends Buff {
         dogfightStack = 0;
         ready = false;
 
+		// 영웅이 광전사(멧돼지 현우)로 전직한 상태라면 전직 후부터 체력 스택 증가
+	    if (target instanceof com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero) {
+	        com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero hero = (com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero) target;
+	
+	        if (hero.subClass == com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass.BERSERKER) {
+	            totalActivations++;
+	            hero.HT += 1; // 최대 체력 1 증가
+	
+	        }
+	    }
+		
         BuffIndicator.refreshHero();
 
     }
