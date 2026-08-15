@@ -89,6 +89,65 @@ ERPD(Eternal Return Pixel Dungeon)는 유명 로그라이크 게임인 [Shattere
 
 
 
+                 [버전 시작]
+                      │
+                      ▼
+             master에서 dev 생성
+                      │
+                      ▼
+              ┌──────────────┐
+              │     dev      │
+              │              │
+              │ 코드 개발    │
+              │ 테스트       │
+              │ DEVLOG 작성  │
+              └──────┬───────┘
+                     │
+                개발 완료
+                     │
+                     ▼
+              PR: dev → master
+                     │
+              Squash & Merge
+                     │
+                     ▼
+              dev 브랜치 삭제
+                     │
+                     ▼
+          master에서 docs 브랜치 생성
+                     │
+                     ▼
+              ┌──────────────┐
+              │    docs      │
+              │              │
+              │ CHANGELOG    │
+              │ 버전 요약    │
+              └──────┬───────┘
+                     │
+                     ▼
+             PR: docs → master
+                     │
+              Squash & Merge
+                     │
+                     ▼
+             docs 브랜치 삭제
+                     │
+                     ▼
+                [버전 완료]
+
+
+
+           ## v0.0.4
+
+### Added
+- 아미야 추가
+
+### Changed
+- 스타터 시스템 개선
+
+### Fixed
+- 스타터 선택 오류 수정
+
 ## 📜 라이선스 및 크레딧 (License & Credits)
 
 * 이 게임은 님블뉴런(Nimble Neuron)의 **'이터널 리턴(Eternal Return)'** IP를 활용한 비공식 팬게임이며, 모든 원작 캐릭터 및 세계관의 저작권은 님블뉴런에 있습니다.
