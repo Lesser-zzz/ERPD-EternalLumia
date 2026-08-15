@@ -20,6 +20,8 @@
  */
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.watabou.utils.Bundle;
 
 public class Berserk extends ShieldBuff {
@@ -35,39 +37,47 @@ public class Berserk extends ShieldBuff {
 		return true;
 	}
 
-	// 👉 여기에 있던 @Override를 삭제했습니다! (에러 원인 해결)
-	public void damage(int damage) {
-		// 피격 시 분노 게이지 차오르는 원본 로직 무력화
-	}
-
-	public boolean berserking() {
-		// 원본 광폭화 진입 무력화 (무조건 false)
-		return false;
-	}
+	public void damage(int damage) { }
+	public boolean berserking() { return false; }
+	public float damageFactor(float dmg) { return dmg; }
+	public void recover(float percent) { }
+	public float enchantFactor(float multi) { return multi; }
 
 	// ========================================================
-	// [컴파일 에러 방어용 더미(Dummy) 메서드들]
-	// 다른 클래스들이 광전사의 스탯 변화를 요구할 때, 아무 변화 없이 원본 값 그대로 돌려줍니다.
+	// [필생즉사 UI 전용 모니터 로직]
 	// ========================================================
-
-	// 1. Char.java 에서 찾는 데미지 증폭 메서드 (데미지 그대로 반환)
-	public float damageFactor(float dmg) {
-		return dmg;
-	}
-
-	// 2. Hero.java 에서 찾는 체력 회복 시 분노 관리 메서드 (아무 일도 안 함)
-	public void recover(float percent) {
-		// Do nothing
-	}
-
-	// 3. Weapon.java 에서 찾는 인챈트 확률 보정 메서드 (확률 그대로 반환)
-	public float enchantFactor(float multi) {
-		return multi;
-	}
 
 	@Override
 	public int icon() {
-		// UI에 아이콘이 아예 뜨지 않도록 숨김 처리
-		return -1;
+		Dogfight dogfight = target.buff(Dogfight.class);
+		if (dogfight == null) return -1; // 도그파이트가 없으면 숨김
+
+		// 개발자님 기획: 쿨다운일 때는 안 띄우고 싶다면 아래 주석을 해제하세요!
+		// if (dogfight.cooldownTurns > 0) return -1; 
+		
+		return BuffIndicator.BERSERK; // 항상 띄울 경우 광전사 아이콘 유지
+	}
+
+	@Override
+	public String name() {
+		Dogfight dogfight = target.buff(Dogfight.class);
+		// 쿨다운 중일 때
+		if (dogfight != null && dogfight.cooldownTurns > 0) {
+			return Messages.get(this, "recovering");
+		}
+		// 대기 중일 때
+		return Messages.get(this, "angered");
+	}
+
+	@Override
+	public String desc() {
+		Dogfight dogfight = target.buff(Dogfight.class);
+		// 쿨다운 중일 때
+		if (dogfight != null && dogfight.cooldownTurns > 0) {
+			return Messages.get(this, "recovering_desc") + "\n\n" + 
+				   Messages.get(this, "recovering_desc_turns", dogfight.cooldownTurns);
+		}
+		// 대기 중일 때
+		return Messages.get(this, "angered_desc");
 	}
 }
