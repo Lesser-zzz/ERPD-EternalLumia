@@ -356,6 +356,8 @@ public class Dogfight extends Buff {
 			// 매 턴 UI를 새로고침하면 렉이 걸릴 수 있으므로, 쿨다운이 0이 딱 되었을 때만 UI를 갱신합니다!
 			if (cooldownTurns == 0) {
 				com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator.refreshHero();
+				// ⭐ [추가] 쿨다운이 끝나는 순간 긍정적인(초록색) 시스템 로그 출력!
+				com.shatteredpixel.shatteredpixeldungeon.utils.GLog.p("탈진에서 회복했습니다. 이제 다시 필생즉사가 발동할 수 있습니다!");
 			}
 		}
 		
