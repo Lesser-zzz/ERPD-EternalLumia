@@ -880,6 +880,18 @@ public class GameScene extends PixelScene {
 				// ⑤ 획득 완료 알림창
 				GLog.i("개발자용 무한 스타터팩 지급 완료!");
 			}
+
+			// 'F5' 키: 텐구의 가면(전직의 서) 즉시 지급 치트!
+			if (com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon.debug && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F5)) {
+			    
+			    // 전직의 서(텐구의 가면) 생성 및 가방에 추가
+			    com.shatteredpixel.shatteredpixeldungeon.items.TomeOfMastery tome = new com.shatteredpixel.shatteredpixeldungeon.items.TomeOfMastery();
+			    if (com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.belongings.backpack.tryAdd(tome)) {
+			        com.shatteredpixel.shatteredpixeldungeon.ui.GameLog.i("디버그: 텐구의 가면을 획득했습니다!");
+			    } else {
+			        com.shatteredpixel.shatteredpixeldungeon.ui.GameLog.w("디버그: 가방이 가득 찼습니다!");
+			    }
+			}
 		}
 		// =========================================================
 
