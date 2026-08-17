@@ -44,7 +44,7 @@ public class Berserk extends ShieldBuff {
 	public float enchantFactor(float multi) { return multi; }
 
 	// ========================================================
-	// [필생즉사 UI 전용 모니터 로직]
+	// [필사즉생 UI 전용 모니터 로직]
 	// ========================================================
 
 	@Override
