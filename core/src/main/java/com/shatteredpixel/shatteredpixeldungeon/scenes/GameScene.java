@@ -896,7 +896,7 @@ public class GameScene extends PixelScene {
 			// ==========================================
 			// F6 키: 모든 종류의 반지 바닥에 소환 (+15강, 자동 감정)
 			// ==========================================
-			if (com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon.debug && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F6)) {
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F6)) {
 			    Class<?>[] rings = {
 			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfAccuracy.class,
 			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfElements.class,
@@ -915,17 +915,17 @@ public class GameScene extends PixelScene {
 			        try {
 			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
 			            item.upgrade(15);
-			            item.identify(); // 줍자마자 무슨 반지인지 알 수 있게 감정 처리
+			            item.identify(); 
 			            com.shatteredpixel.shatteredpixeldungeon.Dungeon.level.drop(item, com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.pos);
 			        } catch (Exception e) {}
 			    }
-			    com.shatteredpixel.shatteredpixeldungeon.ui.GameLog.i("디버그: 모든 종류의 15강 반지가 소환되었습니다!");
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 모든 종류의 15강 반지가 소환되었습니다!");
 			}
 			
 			// ==========================================
 			// F7 키: 모든 종류의 일기장(주문서) 바닥에 소환 (99장씩)
 			// ==========================================
-			if (com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon.debug && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F7)) {
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F7)) {
 			    Class<?>[] scrolls = {
 			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfIdentify.class,
 			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation.class,
@@ -937,8 +937,7 @@ public class GameScene extends PixelScene {
 			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfLullaby.class,
 			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImage.class,
 			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRetribution.class,
-			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTransmutation.class,
-			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfAntiMagic.class
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTransmutation.class
 			    };
 			    for (Class<?> cl : scrolls) {
 			        try {
@@ -948,13 +947,13 @@ public class GameScene extends PixelScene {
 			            com.shatteredpixel.shatteredpixeldungeon.Dungeon.level.drop(item, com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.pos);
 			        } catch (Exception e) {}
 			    }
-			    com.shatteredpixel.shatteredpixeldungeon.ui.GameLog.i("디버그: 모든 종류의 일기장이 99장씩 소환되었습니다!");
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 모든 종류의 일기장이 99장씩 소환되었습니다!");
 			}
 			
 			// ==========================================
 			// F8 키: 모든 종류의 물약 바닥에 소환 (99개씩)
 			// ==========================================
-			if (com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon.debug && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F8)) {
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F8)) {
 			    Class<?>[] potions = {
 			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHealing.class,
 			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfExperience.class,
@@ -977,13 +976,13 @@ public class GameScene extends PixelScene {
 			            com.shatteredpixel.shatteredpixeldungeon.Dungeon.level.drop(item, com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.pos);
 			        } catch (Exception e) {}
 			    }
-			    com.shatteredpixel.shatteredpixeldungeon.ui.GameLog.i("디버그: 모든 종류의 물약이 99개씩 소환되었습니다!");
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 모든 종류의 물약이 99개씩 소환되었습니다!");
 			}
 			
 			// ==========================================
 			// F9 키: 모든 종류의 유물 바닥에 소환 (+10강)
 			// ==========================================
-			if (com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon.debug && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F9)) {
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F9)) {
 			    Class<?>[] artifacts = {
 			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit.class,
 			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CapeOfThorns.class,
@@ -999,14 +998,13 @@ public class GameScene extends PixelScene {
 			    for (Class<?> cl : artifacts) {
 			        try {
 			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
-			            item.upgrade(10); // 유물은 보통 10강이 만렙입니다
+			            item.upgrade(10); // 유물은 10강이 만렙입니다
 			            item.identify();
 			            com.shatteredpixel.shatteredpixeldungeon.Dungeon.level.drop(item, com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.pos);
 			        } catch (Exception e) {}
 			    }
-			    com.shatteredpixel.shatteredpixeldungeon.ui.GameLog.i("디버그: 모든 종류의 10강 유물이 소환되었습니다!");
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 모든 종류의 10강 유물이 소환되었습니다!");
 			}
-
 			
 		}
 		// =========================================================
