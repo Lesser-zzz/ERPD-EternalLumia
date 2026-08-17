@@ -2310,12 +2310,12 @@ public class Hero extends Char {
 					buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dogfight.class);
 				boolean isOnCooldown = (dogfight != null && dogfight.cooldownTurns > 0);
 
-				// 2. 쿨다운이 아니고, 현재 필생즉사(Fury) 버프가 적용 중이지 않은 첫 사망 위기일 때 발동
+				// 2. 쿨다운이 아니고, 현재 필사즉생(Fury) 버프가 적용 중이지 않은 첫 사망 위기일 때 발동
 				if (fury == null && buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class) == null && !isOnCooldown) {
 
 					HP = 1; // 체력 1 고정으로 생존
 
-					// 15턴간 필생즉사 버프 부여
+					// 15턴간 필사즉생 버프 부여
 					com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect(
 						this, com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class, 15f
 					);
@@ -2340,13 +2340,13 @@ public class Hero extends Char {
 
 					// 🛡️ [수정 핵심 2] sprite 널 체크 방어막 (전격 함정 등 튕김 원천 차단)
 					if (sprite != null) {
-						sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite.POSITIVE, "필생즉사!");
+						sprite.showStatus(com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite.POSITIVE, "필사즉생!");
 					}
 					
 					fury = buff(com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Fury.class);
 				}
 
-				// 필생즉사 버프가 들어있는 동안 사망하지 않음
+				// 필사즉생 버프가 들어있는 동안 사망하지 않음
 				return fury != null;
 			}
 		} else {
