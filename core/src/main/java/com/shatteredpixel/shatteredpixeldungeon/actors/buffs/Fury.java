@@ -14,7 +14,7 @@ public class Fury extends FlavourBuff {
             
             // 현우에게 방어막이 완전히 사라졌는지(null) 체크
             if (hero.buff(Barrier.class) == null) {
-                detach(); // 보호막 깨짐 = 필생즉사 강제 종료!
+                detach(); // 보호막 깨짐 = 필사즉생 강제 종료!
                 return true; 
             }
         }
