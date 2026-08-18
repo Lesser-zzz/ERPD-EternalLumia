@@ -916,8 +916,8 @@ public class GameScene extends PixelScene {
 			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
 			            item.upgrade(15);
 			            item.identify(); 
-			            // F5와 동일하게 가방에 직접 지급합니다!
-			            com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.belongings.backpack.tryAdd(item);
+			            // tryAdd 대신 엔진 기본 획득 메서드인 collect() 사용
+			            item.collect();
 			        } catch (Exception e) {}
 			    }
 			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 15강 반지들이 가방에 지급되었습니다!");
@@ -945,7 +945,7 @@ public class GameScene extends PixelScene {
 			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
 			            item.quantity(99);
 			            item.identify(); 
-			            com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.belongings.backpack.tryAdd(item);
+			            item.collect();
 			        } catch (Exception e) {}
 			    }
 			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 일기장들이 가방에 99장씩 지급되었습니다!");
@@ -974,7 +974,7 @@ public class GameScene extends PixelScene {
 			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
 			            item.quantity(99);
 			            item.identify(); 
-			            com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.belongings.backpack.tryAdd(item);
+			            item.collect();
 			        } catch (Exception e) {}
 			    }
 			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 물약들이 가방에 99개씩 지급되었습니다!");
@@ -1001,7 +1001,7 @@ public class GameScene extends PixelScene {
 			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
 			            item.upgrade(10); 
 			            item.identify();
-			            com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.belongings.backpack.tryAdd(item);
+			            item.collect();
 			        } catch (Exception e) {}
 			    }
 			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 10강 유물들이 가방에 지급되었습니다!");
