@@ -893,6 +893,128 @@ public class GameScene extends PixelScene {
 			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 텐구의 가면을 획득했습니다!");
 			}
 
+			// ==========================================
+			// ==========================================
+			// F6 키: 모든 종류의 반지 가방에 즉시 지급 (+15강)
+			// ==========================================
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F6)) {
+			    Class<?>[] rings = {
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfAccuracy.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfElements.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEvasion.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfForce.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfFuror.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfHaste.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfMight.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfTenacity.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfWealth.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfArcana.class
+			    };
+			    for (Class<?> cl : rings) {
+			        try {
+			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
+			            item.upgrade(15);
+			            item.identify(); 
+			            // 1순위: 가방에 넣기 시도. 2순위: 가방이 꽉 찼다면 현재 위치 바닥에 드랍!
+			            if (!item.collect()) {
+			                com.shatteredpixel.shatteredpixeldungeon.Dungeon.level.drop(item, com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.pos);
+			            }
+			        } catch (Exception e) {}
+			    }
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 15강 반지들이 지급되었습니다! (가방 부족 시 바닥 드랍)");
+			}
+			
+			// ==========================================
+			// F7 키: 모든 종류의 일기장(주문서) 가방에 즉시 지급 (99장씩)
+			// ==========================================
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F7)) {
+			    Class<?>[] scrolls = {
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfIdentify.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRemoveCurse.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRecharging.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfUpgrade.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTerror.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfLullaby.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImage.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRetribution.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTransmutation.class
+			    };
+			    for (Class<?> cl : scrolls) {
+			        try {
+			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
+			            item.quantity(99);
+			            item.identify(); 
+			            if (!item.collect()) {
+			                com.shatteredpixel.shatteredpixeldungeon.Dungeon.level.drop(item, com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.pos);
+			            }
+			        } catch (Exception e) {}
+			    }
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 일기장들이 99장씩 지급되었습니다! (가방 부족 시 바닥 드랍)");
+			}
+			
+			// ==========================================
+			// F8 키: 모든 종류의 물약 가방에 즉시 지급 (99개씩)
+			// ==========================================
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F8)) {
+			    Class<?>[] potions = {
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHealing.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfExperience.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfStrength.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLiquidFlame.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfToxicGas.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfParalyticGas.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLevitation.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfInvisibility.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfMindVision.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfPurity.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfFrost.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHaste.class
+			    };
+			    for (Class<?> cl : potions) {
+			        try {
+			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
+			            item.quantity(99);
+			            item.identify(); 
+			            if (!item.collect()) {
+			                com.shatteredpixel.shatteredpixeldungeon.Dungeon.level.drop(item, com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.pos);
+			            }
+			        } catch (Exception e) {}
+			    }
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 물약들이 99개씩 지급되었습니다! (가방 부족 시 바닥 드랍)");
+			}
+			
+			// ==========================================
+			// F9 키: 모든 종류의 유물 가방에 즉시 지급 (+10강)
+			// ==========================================
+			if (com.watabou.noosa.Game.version != null && com.watabou.noosa.Game.version.contains("INDEV") && com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F9)) {
+			    Class<?>[] artifacts = {
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CapeOfThorns.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.EtherealChains.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HornOfPlenty.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MasterThievesArmband.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TalismanOfForesight.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TimekeepersHourglass.class,
+			        com.shatteredpixel.shatteredpixeldungeon.items.artifacts.UnstableSpellbook.class
+			    };
+			    for (Class<?> cl : artifacts) {
+			        try {
+			            com.shatteredpixel.shatteredpixeldungeon.items.Item item = (com.shatteredpixel.shatteredpixeldungeon.items.Item) cl.newInstance();
+			            item.upgrade(10); 
+			            item.identify();
+			            if (!item.collect()) {
+			                com.shatteredpixel.shatteredpixeldungeon.Dungeon.level.drop(item, com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero.pos);
+			            }
+			        } catch (Exception e) {}
+			    }
+			    com.shatteredpixel.shatteredpixeldungeon.utils.GLog.i("디버그: 10강 유물들이 지급되었습니다! (가방 부족 시 바닥 드랍)");
+			}
 			
 		}
 		// =========================================================
